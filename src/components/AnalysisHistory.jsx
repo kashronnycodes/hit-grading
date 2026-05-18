@@ -1,6 +1,6 @@
 import { History } from 'lucide-react';
 
-export function AnalysisHistory({ items }) {
+export function AnalysisHistory({ items, loading }) {
   return (
     <section className="history-section">
       <div className="history-heading">
@@ -9,26 +9,30 @@ export function AnalysisHistory({ items }) {
       </div>
 
       {items.length === 0 ? (
-        <div className="history-empty">Analyzed cards will appear here after grading.</div>
+        <div className="history-empty">{loading ? 'Loading saved scans...' : 'Detected cards will appear here after scanning.'}</div>
       ) : (
         <div className="history-list">
           {items.map((item) => (
-            <article className="history-item" key={item.id}>
+            <article className="history-item" key={item.scanId || item.id}>
               <div className="history-thumbs">
-                {item.previews.front ? <img src={item.previews.front} alt="Analyzed card front" /> : <div>Front</div>}
-                {item.previews.back ? <img src={item.previews.back} alt="Analyzed card back" /> : <div>Back</div>}
+                {item.normalizedImageUrl || item.previews?.front ? <img src={item.normalizedImageUrl || item.previews.front} alt="Analyzed card front" /> : <div>Front</div>}
+                {item.rawImageUrl || item.previews?.back ? <img src={item.rawImageUrl || item.previews.back} alt="Analyzed card back" /> : <div>Back</div>}
               </div>
               <div className="history-copy">
                 <div className="history-title">
-                  <strong>{item.frontName}</strong>
-                  <span>{item.createdAt}</span>
+                  <strong>{item.closestMatch?.cardName || item.detectedDetails?.cardName || 'Unconfirmed card'}</strong>
+                  <span>{item.createdAt ? new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(item.createdAt)) : 'Just now'}</span>
                 </div>
                 <div className="history-stats">
-                  <span>Grade {item.grade.toFixed(1)}</span>
-                  <span>{item.conditionLabel}</span>
-                  <span>{item.confidence}% confidence</span>
+                  <span>{item.closestMatch?.game || item.detectedGame || 'Unknown game'}</span>
+                  <span>{item.closestMatch?.setOrSeries || item.detectedDetails?.setOrSeries || 'No set/series'}</span>
+                  <span>{item.closestMatch?.rarity || item.detectedDetails?.rarity || 'Unknown rarity'}</span>
                 </div>
-                <p>{item.marketValueRange}</p>
+                <p>
+                  {item.closestMatch?.estimatedValue
+                    ? `${item.closestMatch.estimatedValue.currency || 'USD'} ${item.closestMatch.estimatedValue.market || item.closestMatch.estimatedValue.mid || item.closestMatch.estimatedValue.high || item.closestMatch.estimatedValue.low || 'N/A'}`
+                    : 'No pricing yet'}
+                </p>
               </div>
             </article>
           ))}
