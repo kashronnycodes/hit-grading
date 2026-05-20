@@ -20,6 +20,7 @@ export class ScanPersistenceService {
         payload: record,
         embedding: null
       });
+      // TODO: add pgvector column population when CLIP/DINO embeddings are generated.
     }
   }
 

@@ -75,9 +75,8 @@ export class CardBoundaryDetectionService {
 
     if (!best) return null;
 
-    const metadata = await sharp(buffer).metadata();
-    const scaleX = metadata.width ? metadata.width / sourceWidth : 1;
-    const scaleY = metadata.height ? metadata.height / sourceHeight : 1;
+    const scaleX = (await sharp(buffer).metadata()).width ? ((await sharp(buffer).metadata()).width as number) / sourceWidth : 1;
+    const scaleY = (await sharp(buffer).metadata()).height ? ((await sharp(buffer).metadata()).height as number) / sourceHeight : 1;
     const corners = best.corners.map((point) => ({ x: point.x * scaleX, y: point.y * scaleY })) as [Point, Point, Point, Point];
     const outlinedDebugBuffer = await renderOutline(buffer, corners);
 

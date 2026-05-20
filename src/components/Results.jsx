@@ -1,11 +1,12 @@
 import { RotateCcw, Sparkles } from 'lucide-react';
+import { IdentificationDebugPanel } from './IdentificationDebugPanel.jsx';
 
 export function Results({ result, files, previews, onReset, onConfirm, onShowAlternatives, onPickAlternative, showAlternatives, onStartManualCrop }) {
   const closestMatch = result.closestMatch;
   const hasMatch = Boolean(closestMatch);
   const detected = result.detectedDetails || {};
-  const debugEnabled = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
-  const debugRegions = debugEnabled ? result.debug?.ocr?.regionImages : null;
+  const alternatives = result.alternatives?.length ? result.alternatives : (result.possibleMatches || []);
+  const debugEnabled = import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
 
   return (
     <section className="results-card">
@@ -41,7 +42,7 @@ export function Results({ result, files, previews, onReset, onConfirm, onShowAlt
           <li>Card Name: {detected.cardName || 'Not found'}</li>
           <li>Card Number: {detected.cardNumber || 'Not found'}</li>
           <li>Language: {detected.language || 'Unknown'}</li>
-          <li>Set/Series: {detected.setOrSeries || 'Not found'}</li>
+          <li>Set/Series: {detected.setOrSeries || detected.setSeries || detected.setCode || 'Not found'}</li>
           <li>Rarity: {detected.rarity || 'Unknown'}</li>
         </ul>
       </div>
@@ -81,11 +82,11 @@ export function Results({ result, files, previews, onReset, onConfirm, onShowAlt
         </div>
       </div>
 
-      {result.warnings?.length ? (
+      {result.detectionNotes?.length || result.warnings?.length ? (
         <div className="notes-panel">
           <h3>Detection Notes</h3>
           <ul>
-            {result.warnings.map((warning) => <li key={warning}>{warning}</li>)}
+            {(result.detectionNotes || result.warnings || []).map((warning) => <li key={warning}>{warning}</li>)}
           </ul>
         </div>
       ) : null}
@@ -97,7 +98,7 @@ export function Results({ result, files, previews, onReset, onConfirm, onShowAlt
             Yes, this is correct
           </button>
         ) : null}
-        {result.manualSearchSuggested && result.rawImageUrl ? (
+        {(result.manualSearchSuggested || result.status === 'needs_manual_crop') && result.rawImageUrl ? (
           <button className="secondary-action ghost-action" onClick={onStartManualCrop}>
             Crop card manually
           </button>
@@ -109,7 +110,7 @@ export function Results({ result, files, previews, onReset, onConfirm, onShowAlt
 
       {showAlternatives ? (
         <div className="alternatives-panel">
-          {result.alternatives.length ? result.alternatives.map((candidate) => (
+          {alternatives.length ? alternatives.map((candidate) => (
             <button className="alternative-item" key={`${candidate.source}-${candidate.id}`} onClick={() => onPickAlternative(candidate)}>
               <span>{candidate.cardName}</span>
               <strong>
@@ -122,21 +123,7 @@ export function Results({ result, files, previews, onReset, onConfirm, onShowAlt
         </div>
       ) : null}
 
-      {debugRegions ? (
-        <div className="notes-panel">
-          <h3>Developer OCR Regions</h3>
-          <div className="result-previews">
-            {Object.entries(debugRegions).map(([label, imageUrl]) => (
-              imageUrl ? (
-                <div className="result-preview" key={label}>
-                  <img src={imageUrl} alt={`${label} OCR region`} />
-                  <span>{label}</span>
-                </div>
-              ) : null
-            ))}
-          </div>
-        </div>
-      ) : null}
+      {debugEnabled ? <IdentificationDebugPanel result={result} previews={previews} /> : null}
 
       <button className="secondary-action" onClick={onReset}>
         <RotateCcw size={19} /> Grade Another Card

@@ -1,11 +1,11 @@
-import type { CardApiAdapter, CardCandidate, CardDetails, SupportedGame } from '../types/cards.js';
+import type { ApiSearchDebugEntry, CardApiAdapter, CardCandidate, CardDetails, SupportedGame } from '../types/cards.js';
 
 export abstract class BaseCardAdapter implements CardApiAdapter {
   abstract readonly game: SupportedGame;
   abstract readonly source: string;
 
-  abstract searchByName(query: string, language?: string): Promise<CardCandidate[]>;
-  abstract searchByNumber(cardNumber: string, setCode?: string, language?: string): Promise<CardCandidate[]>;
+  abstract searchByName(query: string, language?: string, debugCollector?: ApiSearchDebugEntry[]): Promise<CardCandidate[]>;
+  abstract searchByNumber(cardNumber: string, setCode?: string, language?: string, debugCollector?: ApiSearchDebugEntry[]): Promise<CardCandidate[]>;
   abstract getCardById(id: string, language?: string): Promise<CardDetails | null>;
 
   protected buildPrice(

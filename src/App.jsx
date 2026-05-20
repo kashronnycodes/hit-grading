@@ -19,6 +19,10 @@ function isSupportedImage(file) {
   return Boolean(file && (supportedTypes.includes(file.type) || /\.(jpe?g|png|heic|heif)$/i.test(file.name)));
 }
 
+function isDebugModeEnabled() {
+  return import.meta.env.DEV && typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
+}
+
 async function compressForUpload(file) {
   if (!file || file.type === 'image/heic' || file.type === 'image/heif') return file;
   const imageUrl = URL.createObjectURL(file);
@@ -70,6 +74,7 @@ export default function App() {
         });
       })
       .catch(() => {
+        // History gracefully falls back to empty when the API is offline.
       });
     return () => {
       active = false;
@@ -115,11 +120,13 @@ export default function App() {
         frontFile: compressedFront,
         backFile: compressedBack,
         selectedGame,
-        selectedLanguage
+        selectedLanguage,
+        debugMode: isDebugModeEnabled()
       });
       setResult(detection);
       setHistory((current) => [detection, ...current.filter((item) => item.scanId !== detection.scanId)].slice(0, 8));
-      setStatus(detection.status === 'partial' ? 'review' : 'complete');
+      setShowManualCrop(detection.status === 'needs_manual_crop');
+      setStatus(detection.status === 'partial' || detection.status === 'needs_manual_crop' || detection.status === 'needs_manual_review' ? 'review' : 'complete');
     } catch (analysisError) {
       setStatus('error');
       setError(analysisError.message || 'Card detection could not be completed. Please try again.');
@@ -175,12 +182,13 @@ export default function App() {
         backFile: compressedBack,
         selectedGame,
         selectedLanguage,
-        manualCrop
+        manualCrop,
+        debugMode: isDebugModeEnabled()
       });
       setResult(detection);
       setHistory((current) => [detection, ...current.filter((item) => item.scanId !== detection.scanId)].slice(0, 8));
-      setShowManualCrop(false);
-      setStatus(detection.status === 'partial' ? 'review' : 'complete');
+      setShowManualCrop(detection.status === 'needs_manual_crop');
+      setStatus(detection.status === 'partial' || detection.status === 'needs_manual_crop' || detection.status === 'needs_manual_review' ? 'review' : 'complete');
     } catch (analysisError) {
       setStatus('error');
       setError(analysisError.message || 'Manual crop detection could not be completed. Please try again.');
@@ -263,6 +271,7 @@ export default function App() {
       ) : showManualCrop ? (
         <ManualCropper
           imageUrl={result.rawImageUrl}
+          initialCrop={result.crop?.coordinates}
           submitting={status === 'scanning'}
           onSubmit={handleManualCropDetect}
           onCancel={() => setShowManualCrop(false)}

@@ -3,7 +3,7 @@ import { Crop, Move } from 'lucide-react';
 
 const CARD_ASPECT = 734 / 1024;
 
-export function ManualCropper({ imageUrl, onSubmit, onCancel, submitting }) {
+export function ManualCropper({ imageUrl, initialCrop, onSubmit, onCancel, submitting }) {
   const imageRef = useRef(null);
   const frameRef = useRef(null);
   const dragRef = useRef(null);
@@ -17,6 +17,15 @@ export function ManualCropper({ imageUrl, onSubmit, onCancel, submitting }) {
       const width = image.naturalWidth || 1;
       const height = image.naturalHeight || 1;
       setImageSize({ width, height });
+      if (initialCrop?.width && initialCrop?.height) {
+        setCrop({
+          x: clamp(initialCrop.x || 0, 0, 0.95),
+          y: clamp(initialCrop.y || 0, 0, 0.95),
+          width: clamp(initialCrop.width, 0.2, 0.95),
+          height: clamp(initialCrop.height, 0.28, 0.95)
+        });
+        return;
+      }
       const cropWidth = 0.64;
       const cropHeight = Math.min(0.82, cropWidth * width / (CARD_ASPECT * height));
       setCrop({
@@ -29,7 +38,7 @@ export function ManualCropper({ imageUrl, onSubmit, onCancel, submitting }) {
     image.addEventListener('load', onLoad);
     if (image.complete) onLoad();
     return () => image.removeEventListener('load', onLoad);
-  }, [imageUrl]);
+  }, [imageUrl, initialCrop]);
 
   const cropStyle = useMemo(() => ({
     left: `${crop.x * 100}%`,
@@ -91,7 +100,7 @@ export function ManualCropper({ imageUrl, onSubmit, onCancel, submitting }) {
       </div>
 
       <p className="cropper-copy">
-        Move the frame so it fits tightly around the card, then continue detection.
+        Move the frame so it fits around the full card, including the top name and bottom collector number.
       </p>
 
       <div

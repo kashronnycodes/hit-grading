@@ -5,6 +5,8 @@ dist-server/
 .env
 server/storage/
 server/cache/
+eng.traineddata
+pet-runs/
 *.log
 .DS_Store
 Thumbs.db

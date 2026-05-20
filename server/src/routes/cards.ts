@@ -11,6 +11,9 @@ const upload = multer({
 const detectBodySchema = z.object({
   selectedGame: z.string().optional(),
   selectedLanguage: z.string().optional(),
+  game: z.string().optional(),
+  language: z.string().optional(),
+  debugMode: z.string().optional(),
   manualCrop: z.string().optional()
 });
 
@@ -18,7 +21,8 @@ const manualCropSchema = z.object({
   x: z.number().min(0).max(1),
   y: z.number().min(0).max(1),
   width: z.number().positive().max(1),
-  height: z.number().positive().max(1)
+  height: z.number().positive().max(1),
+  rotation: z.number().min(-20).max(20).optional()
 });
 
 const publicCardMatchSchema = z.object({
@@ -59,32 +63,48 @@ export function createCardsRouter(cardDetectionService = new CardDetectionServic
     ]),
     async (req, res, next) => {
       try {
+        console.log('[cards:detect] route hit');
         const parsed = detectBodySchema.parse(req.body);
         const files = req.files as Record<string, Express.Multer.File[]> | undefined;
         const frontImage = files?.image?.[0] ?? files?.frontImage?.[0];
         const backImage = files?.backImage?.[0];
+        const selectedGame = parsed.selectedGame ?? parsed.game;
+        const selectedLanguage = parsed.selectedLanguage ?? parsed.language ?? 'English';
+
+        console.log('[cards:detect] files received', {
+          frontImage: frontImage ? { name: frontImage.originalname, type: frontImage.mimetype, size: frontImage.size } : null,
+          backImage: backImage ? { name: backImage.originalname, type: backImage.mimetype, size: backImage.size } : null
+        });
+        console.log('[cards:detect] req.body game/language received', { selectedGame, selectedLanguage });
 
         if (!frontImage) {
-          res.status(400).json({ error: 'An image file is required.' });
-          return;
+          console.log('[cards:detect] final response sent: missing image');
+          return res.status(400).json({ error: 'An image file is required.' });
         }
 
         const result = await cardDetectionService.detect({
           imageBuffer: frontImage.buffer,
           filename: frontImage.originalname,
           mimeType: frontImage.mimetype,
-          selectedGame: parsed.selectedGame,
-          selectedLanguage: parsed.selectedLanguage,
+          selectedGame,
+          selectedLanguage,
+          debugMode: parsed.debugMode === 'true',
           backImageBuffer: backImage?.buffer,
           manualCrop: parsed.manualCrop ? manualCropSchema.parse(JSON.parse(parsed.manualCrop)) : undefined
         });
 
-        res.json(result);
+        console.log('[cards:detect] final response sent', {
+          status: result.status,
+          cardName: result.detectedDetails?.cardName,
+          alternatives: result.alternatives?.length ?? 0
+        });
+        return res.json(result);
       } catch (error) {
         const message = error instanceof Error
           ? error.message
           : 'Could not detect card. Please try a clearer image or select the card game manually.';
-        res.status(500).json({
+        console.error('[cards:detect] errors caught', message);
+        return res.status(500).json({
           error: message,
           manualSearchSuggested: true
         });

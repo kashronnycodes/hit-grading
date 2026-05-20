@@ -13,12 +13,13 @@ function withTimeout(promise, ms, controller) {
   return promise.finally(() => clearTimeout(timeout));
 }
 
-export async function detectCardScan({ frontFile, backFile, selectedGame, selectedLanguage, manualCrop }) {
+export async function detectCardScan({ frontFile, backFile, selectedGame, selectedLanguage, manualCrop, debugMode }) {
   const formData = new FormData();
   formData.append('frontImage', frontFile);
   if (backFile) formData.append('backImage', backFile);
   if (selectedGame) formData.append('selectedGame', selectedGame);
   if (selectedLanguage) formData.append('selectedLanguage', selectedLanguage);
+  if (debugMode) formData.append('debugMode', 'true');
   if (manualCrop) formData.append('manualCrop', JSON.stringify(manualCrop));
   const controller = new AbortController();
   try {

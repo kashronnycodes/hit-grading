@@ -24,7 +24,7 @@ export class ApiTcgAdapter extends BaseCardAdapter {
     super();
   }
 
-  async searchByName(query: string): Promise<CardCandidate[]> {
+  async searchByName(query: string, _language?: string): Promise<CardCandidate[]> {
     const response = await requestJson<ApiTcgList>(
       `${env.API_TCG_BASE_URL}/${this.path}/cards?name=${encodeURIComponent(query)}`,
       { headers: this.headers() },
