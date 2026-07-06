@@ -1,5 +1,5 @@
 function formatValue(value, fallback = 'Not detected') {
-  return value || fallback;
+  return value === 0 || value ? value : fallback;
 }
 
 function formatConfidence(value) {
@@ -16,6 +16,9 @@ export function IdentificationDebugPanel({ result, previews }) {
   const extracted = debug?.extractedFields || {};
   const topMatches = debug?.topMatches || [];
   const queries = debug?.queriesUsed || result.debug?.queriesUsed || [];
+  const collectorCandidates = result.collectorNumberCandidates || result.debug?.ocr?.collectorNumberCandidates || [];
+  const evidence = result.matchEvidence || {};
+  const gradingDebug = result.conditionEstimate?.debug;
 
   return (
     <section className="debug-panel">
@@ -70,7 +73,22 @@ export function IdentificationDebugPanel({ result, previews }) {
           <div><dt>Detected language</dt><dd>{formatValue(extracted.language)}</dd></div>
           <div><dt>Rarity</dt><dd>{formatValue(extracted.rarity)}</dd></div>
           <div><dt>Text clue</dt><dd>{formatValue(extracted.attackNameHint)}</dd></div>
+          <div><dt>Chosen collector number</dt><dd>{formatValue(result.chosenCollectorNumber || result.debug?.ocr?.chosenCollectorNumber)}</dd></div>
+          <div><dt>Collector confidence</dt><dd>{formatValue(result.collectorNumberConfidence || result.debug?.ocr?.collectorNumberConfidence)}</dd></div>
         </dl>
+      </div>
+
+      <div className="debug-field-list">
+        <h3>Collector Number Candidates</h3>
+        {collectorCandidates.length ? (
+          <ol className="debug-query-list">
+            {collectorCandidates.map((candidate, index) => (
+              <li key={`${candidate.value}-${index}`}>
+                {candidate.value} | votes: {candidate.votes} | confidence: {candidate.confidence} | source: {candidate.source}
+              </li>
+            ))}
+          </ol>
+        ) : <p>No collector-number candidates were returned.</p>}
       </div>
 
       <div className="debug-field-list">
@@ -131,6 +149,17 @@ export function IdentificationDebugPanel({ result, previews }) {
         </div>
       </div>
 
+      <div className="debug-field-list">
+        <h3>Final Selected Match</h3>
+        <dl>
+          <div><dt>Source</dt><dd>{formatValue(evidence.source || result.officialMatch?.source)}</dd></div>
+          <div><dt>Confidence</dt><dd>{formatValue(evidence.confidenceLabel || result.officialMatch?.confidenceLabel)}</dd></div>
+          <div><dt>Name matched</dt><dd>{String(Boolean(evidence.nameMatched))}</dd></div>
+          <div><dt>Number matched</dt><dd>{String(Boolean(evidence.numberMatched))}</dd></div>
+          <div><dt>Set matched</dt><dd>{String(Boolean(evidence.setMatched))}</dd></div>
+        </dl>
+      </div>
+
       {regionImages ? (
         <div className="debug-field-list">
           <h3>OCR Region Crops</h3>
@@ -145,6 +174,38 @@ export function IdentificationDebugPanel({ result, previews }) {
             ))}
           </div>
         </div>
+      ) : null}
+
+      {gradingDebug ? (
+        <details className="debug-details">
+          <summary>Condition Grading Debug</summary>
+          <div className="debug-field-list">
+            <h3>Image Quality</h3>
+            <dl>
+              <div><dt>Front blur</dt><dd>{formatValue(gradingDebug.blurScores?.front)}</dd></div>
+              <div><dt>Back blur</dt><dd>{formatValue(gradingDebug.blurScores?.back)}</dd></div>
+              <div><dt>Front quality</dt><dd>{formatValue(gradingDebug.frontQualityScore)}</dd></div>
+              <div><dt>Back quality</dt><dd>{formatValue(gradingDebug.backQualityScore)}</dd></div>
+              <div><dt>Front glare</dt><dd>{formatValue(gradingDebug.glareScores?.front)}</dd></div>
+              <div><dt>Back glare</dt><dd>{formatValue(gradingDebug.glareScores?.back)}</dd></div>
+            </dl>
+          </div>
+          <div className="debug-text-block">
+            <span>Centering / edge / corner / surface analysis</span>
+            <pre>{JSON.stringify({
+              rectangles: {
+                front: gradingDebug.frontCardRectangle,
+                back: gradingDebug.backCardRectangle
+              },
+              centeringRatios: gradingDebug.centeringRatios,
+              whiteningMetrics: gradingDebug.whiteningMetrics,
+              edgeMetrics: gradingDebug.edgeMetrics,
+              cornerMetrics: gradingDebug.cornerMetrics,
+              surfaceMetrics: gradingDebug.surfaceMetrics,
+              finalFormula: gradingDebug.finalFormula
+            }, null, 2)}</pre>
+          </div>
+        </details>
       ) : null}
     </section>
   );

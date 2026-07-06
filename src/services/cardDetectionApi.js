@@ -47,6 +47,29 @@ export async function confirmDetectedCard({ scanId, confirmedCardId, confirmedSo
   );
 }
 
+export async function correctDetectedCard({ scanId, cardName, cardNumber, setCode, language }) {
+  return readJson(
+    await fetch(`${API_BASE_URL}/api/cards/correct`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scanId, cardName, cardNumber, setCode, language })
+    })
+  );
+}
+
+export async function gradeCardCondition({ frontFile, backFile, debugMode }) {
+  const formData = new FormData();
+  formData.append('frontImage', frontFile);
+  if (backFile) formData.append('backImage', backFile);
+  if (debugMode) formData.append('debugMode', 'true');
+  return readJson(
+    await fetch(`${API_BASE_URL}/api/cards/grade-condition`, {
+      method: 'POST',
+      body: formData
+    })
+  );
+}
+
 export async function fetchRecentScans() {
   return readJson(await fetch(`${API_BASE_URL}/api/cards/scans`));
 }

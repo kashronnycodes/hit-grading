@@ -1,6 +1,10 @@
-import { Image, Info } from 'lucide-react';
+import { useState } from 'react';
+import { Camera, Image, Info } from 'lucide-react';
+import { CameraCapture } from './CameraCapture.jsx';
 
 export function FileUpload({ id, label, file, preview, onChange }) {
+  const [showCamera, setShowCamera] = useState(false);
+
   return (
     <section className="upload-field">
       <div className="field-heading">
@@ -35,6 +39,9 @@ export function FileUpload({ id, label, file, preview, onChange }) {
             onChange={(event) => onChange(event.target.files?.[0] || null)}
           />
         </label>
+        <button className="file-button camera-open-button" type="button" onClick={() => setShowCamera(true)}>
+          <Camera size={16} /> Use Camera
+        </button>
         <p className="file-name">{file?.name || 'No file chosen'}</p>
       </div>
 
@@ -51,6 +58,14 @@ export function FileUpload({ id, label, file, preview, onChange }) {
       ) : null}
 
       {!preview && file ? <p className="heic-note">{file.name}</p> : null}
+
+      {showCamera ? (
+        <CameraCapture
+          label={label}
+          onCapture={(capturedFile) => onChange(capturedFile)}
+          onClose={() => setShowCamera(false)}
+        />
+      ) : null}
     </section>
   );
 }

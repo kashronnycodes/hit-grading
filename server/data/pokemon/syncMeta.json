@@ -1,0 +1,15 @@
+{
+  "syncedAt": "2026-07-06T10:54:58.197Z",
+  "provider": "tcgdex",
+  "source": "tcgdex-github",
+  "totalCards": 23323,
+  "totalSets": 217,
+  "totalNames": 4155,
+  "languages": [
+    "en"
+  ],
+  "warnings": [
+    "TCGdex API sync failed; falling back to tcgdex-github. TCGdex request failed for https://api.tcgdex.net/v2/en/sets: code UNABLE_TO_VERIFY_LEAF_SIGNATURE - unable to verify the first certificate; if the root CA is installed locally, try running Node.js with --use-system-ca"
+  ],
+  "errors": []
+}

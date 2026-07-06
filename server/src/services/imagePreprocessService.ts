@@ -381,11 +381,14 @@ function validateDetectedCrop(corners: Array<{ x: number; y: number }>, original
     distance(corners[3], corners[0])
   ];
   const minSide = Math.min(...sideLengths);
+  const aspectRatio = cropHeight ? cropWidth / cropHeight : 0;
+  const targetAspectRatio = 0.716;
   const reasons: string[] = [];
 
   if (cropWidth < originalWidth * 0.4) reasons.push('Detected crop width is less than 40% of the original image width.');
   if (cropHeight < originalHeight * 0.4) reasons.push('Detected crop height is less than 40% of the original image height.');
   if (cropArea < originalArea * 0.2) reasons.push('Detected crop area is less than 20% of the original image area.');
+  if (Math.abs(aspectRatio - targetAspectRatio) > 0.28) reasons.push('Detected crop aspect ratio is too far from a Pokemon card shape.');
   if (minSide < Math.min(originalWidth, originalHeight) * 0.12) reasons.push('Detected crop coordinates are too close together.');
 
   return {

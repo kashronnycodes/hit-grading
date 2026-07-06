@@ -16,16 +16,25 @@ export type CardCandidate = {
   cardNumber?: string;
   rarity?: string;
   language?: string;
+  hp?: string;
   imageUrl?: string;
   prices?: {
+    amount?: number;
+    min?: number;
+    max?: number;
     market?: number;
     low?: number;
     mid?: number;
     high?: number;
     currency?: string;
+    source?: string;
+    label?: string;
+    confidence?: string;
+    note?: string;
   };
   confidence?: number;
   confidenceReasons?: string[];
+  releaseDate?: string;
 };
 
 export type PublicDetectedDetails = {
@@ -37,6 +46,7 @@ export type PublicDetectedDetails = {
   setOrSeries?: string | null;
   hp?: string | null;
   rarity?: string | null;
+  year?: string | null;
 };
 
 export type PublicCardMatch = {
@@ -46,16 +56,43 @@ export type PublicCardMatch = {
   cardName: string;
   cardNumber?: string;
   language?: string;
+  setName?: string;
+  setSeries?: string;
   setOrSeries?: string;
+  hp?: string;
   rarity?: string;
   imageUrl?: string;
+  confidenceLabel?: 'Strong match found' | 'Strong match' | 'Fallback match found' | 'Review needed' | 'Low confidence';
+  confidenceScore?: number;
+  setCode?: string;
+  tcgplayerProductId?: string;
   estimatedValue?: {
+    amount?: number;
+    min?: number;
+    max?: number;
     market?: number;
     low?: number;
     mid?: number;
     high?: number;
     currency?: string;
+    source?: string;
+    label?: string;
+    confidence?: string;
+    note?: string;
   };
+};
+
+export type IdentityResultStatus = 'identified' | 'needs_confirmation' | 'needs_better_photo' | 'manual_review' | 'no_match';
+
+export type IdentityResultDecision = {
+  status: IdentityResultStatus;
+  confirmedIdentity: boolean;
+  needsUserConfirmation: boolean;
+  needsBetterPhoto: boolean;
+  pricingEligible: boolean;
+  reason: string;
+  warnings?: string[];
+  confidence?: number;
 };
 
 export type CardDetails = CardCandidate & {
@@ -66,7 +103,12 @@ export type CardDetails = CardCandidate & {
 export type ExtractedCardDetails = {
   name?: string;
   cardNumber?: string;
+  localId?: string;
+  printedNumber?: string;
+  collectorNumber?: string;
+  printedTotal?: string;
   setCode?: string;
+  setName?: string;
   language?: string;
   rarity?: string;
   hp?: string;
@@ -84,6 +126,7 @@ export type ApiSearchDebugEntry = {
   resultCount?: number;
   topMatchName?: string;
   error?: string;
+  errorType?: string;
 };
 
 export type OcrDebugInfo = {
@@ -96,7 +139,12 @@ export type OcrDebugInfo = {
   usefulnessScore?: number;
   weakResultReason?: string;
   rejectedCardNameReason?: string;
-  regionImages?: Partial<Record<'name' | 'attack' | 'bottom', string>>;
+  regionImages?: Partial<Record<'fullCard' | 'name' | 'hp' | 'attack' | 'attackDamage' | 'bottom' | 'collector' | 'collectorRight' | 'collectorClassic' | 'collectorPromo', string>>;
+  collectorNumberCandidates?: CollectorNumberCandidate[];
+  chosenCollectorNumber?: string | null;
+  collectorNumberConfidence?: 'low' | 'medium' | 'high';
+  cropReports?: OcrCropDebugInfo[];
+  collectorQuality?: CollectorOcrQualityInfo[];
 };
 
 export type OcrAttemptDebugInfo = {
@@ -109,6 +157,64 @@ export type OcrAttemptDebugInfo = {
   usefulnessScore: number;
   averageConfidence: number;
   rejectedNameReason?: string;
+  evidenceAttempts?: OcrEvidenceAttemptDebugInfo[];
+  selectedEvidence?: Partial<Record<'hp' | 'bottom' | 'collector' | 'collectorRight' | 'collectorClassic' | 'collectorPromo' | 'collectorFused', string>>;
+  cropReports?: OcrCropDebugInfo[];
+  collectorQuality?: CollectorOcrQualityInfo[];
+};
+
+export type OcrEvidenceAttemptDebugInfo = {
+  region: 'hp' | 'bottom' | 'collector' | 'collectorRight' | 'collectorClassic' | 'collectorPromo' | 'collectorFused';
+  variant: string;
+  rawText: string;
+  cleanedText: string;
+  confidence: number;
+  score: number;
+  reason: string;
+  parsedLocalId?: string;
+  parsedPrintedNumber?: string;
+  parsedCollectorNumber?: string;
+  parsedSetCode?: string;
+  parsedSetName?: string;
+  parsedHp?: string;
+  imagePath?: string;
+  selected?: boolean;
+};
+
+export type OcrCropDebugInfo = {
+  attemptName: string;
+  region: OcrRegionName;
+  percent?: {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  };
+  pixels?: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  };
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+};
+
+export type CollectorOcrQualityInfo = {
+  attemptName: string;
+  roi: 'collector' | 'collectorRight' | 'collectorClassic' | 'collectorPromo' | 'collectorFused';
+  width: number;
+  height: number;
+  blurScore: number;
+  glareRatio: number;
+  contrastScore: number;
+  edgeDensityScore?: number;
+  selectedEvidence?: string;
+  readable: boolean;
+  recaptureRecommended: boolean;
+  reason: string;
 };
 
 export type CardMatchDebugInfo = {
@@ -130,7 +236,14 @@ export type CardScanResult = {
   normalizedImageUrl?: string;
   detectedGame?: string;
   success?: boolean;
-  status?: 'success' | 'partial' | 'error' | 'needs_manual_crop' | 'needs_manual_review';
+  status?: 'success' | 'success_with_fallback' | 'partial' | 'error' | 'needs_manual_crop' | 'needs_manual_review' | 'api_lookup_failed';
+  identityStatus?: IdentityResultStatus;
+  confirmedIdentity?: boolean;
+  userConfirmed?: boolean;
+  needsBetterPhoto?: boolean;
+  pricingEligible?: boolean;
+  reason?: string;
+  identity?: IdentityResultDecision;
   detectedDetails: PublicDetectedDetails;
   closestMatch?: PublicCardMatch;
   officialMatch?: PublicCardMatch | null;
@@ -142,6 +255,13 @@ export type CardScanResult = {
   warnings?: string[];
   detectionNotes?: string[];
   manualSearchSuggested?: boolean;
+  matchEvidence?: MatchEvidence;
+  quality?: ScanQuality;
+  collectorNumberCandidates?: CollectorNumberCandidate[];
+  chosenCollectorNumber?: string | null;
+  collectorNumberConfidence?: 'low' | 'medium' | 'high';
+  correctedFields?: CorrectedCardFields;
+  conditionEstimate?: ConditionGradeResult;
   crop?: {
     mode: 'auto' | 'fallback_center' | 'manual' | 'full_image';
     valid: boolean;
@@ -168,6 +288,15 @@ export type CardScanResult = {
       topResultName?: string;
       calls?: ApiSearchDebugEntry[];
     };
+    pricing?: {
+      providerUsed?: string;
+      cacheStatus?: 'hit' | 'miss' | 'skipped';
+      scrydexCalled?: boolean;
+      scrydexSkippedReason?: string;
+      selectedPriceField?: string;
+      errorType?: string;
+      estimatedValue?: PublicCardMatch['estimatedValue'] | null;
+    };
     identification?: {
       selectedGame?: string;
       selectedLanguage?: string;
@@ -179,6 +308,7 @@ export type CardScanResult = {
       queriesUsed: string[];
       topMatches: CardMatchDebugInfo[];
     };
+    resultDecision?: IdentityResultDecision;
   };
   imageDiagnostics?: {
     blurScore?: number;
@@ -212,10 +342,168 @@ export type CardScanRecord = CardScanResult & {
   confirmedCardId?: string;
   confirmedSource?: string;
   confirmedAt?: string;
+  manuallyCorrected?: boolean;
   rawImagePath?: string;
   normalizedImagePath?: string;
   backImagePath?: string;
   alternativesFull?: PublicCardMatch[];
+};
+
+export type CollectorNumberCandidate = {
+  value: string;
+  localId?: string;
+  printedNumber?: string;
+  printedTotal?: string;
+  setCode?: string;
+  setName?: string;
+  source: string;
+  votes: number;
+  confidence: 'low' | 'medium' | 'high';
+  rawText?: string;
+};
+
+export type MatchEvidence = {
+  matchedCardLabel?: string;
+  nameMatched: boolean;
+  numberMatched: boolean;
+  setMatched: boolean;
+  source?: string;
+  confidenceScore?: number;
+  confidenceLabel?: string;
+  missingFields: string[];
+  uncertainFields: string[];
+  reasons: string[];
+};
+
+export type ScanQuality = {
+  score: number;
+  warnings: string[];
+  recommendation: 'Good to scan' | 'Retake recommended' | 'Scan anyway';
+  checks: {
+    blur?: 'good' | 'warning';
+    glare?: 'good' | 'warning';
+    cropSize?: 'good' | 'warning';
+    darkness?: 'good' | 'warning';
+    perspective?: 'good' | 'warning';
+  };
+};
+
+export type CorrectedCardFields = {
+  cardName?: string;
+  cardNumber?: string;
+  setCode?: string;
+  language?: string;
+  manuallyCorrected?: boolean;
+};
+
+export type CorrectCardInput = CorrectedCardFields & {
+  scanId: string;
+};
+
+export type ConditionCategoryResult = {
+  score: number | null;
+  notes: string[];
+  frontScore: number | null;
+  backScore: number | null;
+};
+
+export type WhiteningCategoryResult = {
+  score: number | null;
+  notes: string[];
+  backScore: number | null;
+};
+
+export type ConditionGradeResult = {
+  gradeAvailable: boolean;
+  mode: 'full_estimate' | 'partial_estimate' | 'low_confidence_estimate' | 'unavailable';
+  estimatedGrade: number | null;
+  photoQualityScore?: number;
+  gradingConfidence?: 'low' | 'medium' | 'high';
+  conditionScore?: number | null;
+  gradeLabel: string;
+  confidence: 'low' | 'medium' | 'high';
+  disclaimer: string;
+  summary: string;
+  message?: string;
+  breakdown: {
+    centering: ConditionCategoryResult;
+    corners: ConditionCategoryResult & {
+      cornerDetails: {
+        frontTopLeft?: string;
+        frontTopRight?: string;
+        frontBottomLeft?: string;
+        frontBottomRight?: string;
+        backTopLeft?: string;
+        backTopRight?: string;
+        backBottomLeft?: string;
+        backBottomRight?: string;
+      };
+    };
+    edges: ConditionCategoryResult;
+    surface: ConditionCategoryResult;
+    whitening: WhiteningCategoryResult;
+    printQuality: {
+      score: number | null;
+      notes: string[];
+    };
+  };
+  capRulesApplied: string[];
+  warnings: string[];
+  retakeTips: string[];
+  debug?: {
+    frontQualityScore?: number;
+    backQualityScore?: number;
+    frontCardRectangle?: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      corners: Array<{ x: number; y: number }>;
+    };
+    backCardRectangle?: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      corners: Array<{ x: number; y: number }>;
+    };
+    centeringRatios?: {
+      frontLeftRight?: string;
+      frontTopBottom?: string;
+      backLeftRight?: string;
+      backTopBottom?: string;
+      front?: CenteringDebugInfo;
+      back?: CenteringDebugInfo;
+    };
+    blurScores?: {
+      front: number;
+      back?: number;
+    };
+    glareScores?: {
+      front: number;
+      back?: number;
+    };
+    whiteningMetrics?: Record<string, unknown>;
+    edgeMetrics?: Record<string, unknown>;
+    cornerMetrics?: Record<string, unknown>;
+    surfaceMetrics?: Record<string, unknown>;
+    conditionScoreBeforeCaps?: number | null;
+    conditionScoreAfterCaps?: number | null;
+    confidencePenaltyReasons?: string[];
+    actualDamageDetected?: boolean;
+    capsApplied?: string[];
+    blurOrCropAffectedConfidenceOnly?: boolean;
+    finalFormula?: string;
+  };
+};
+
+export type CenteringDebugInfo = {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  horizontalBalance: number;
+  verticalBalance: number;
 };
 
 export interface CardApiAdapter {
@@ -243,7 +531,7 @@ export type DetectCardInput = {
   };
 };
 
-export type OcrRegionName = 'full' | 'title' | 'footer' | 'number' | 'name' | 'hp' | 'attack' | 'bottom';
+export type OcrRegionName = 'full' | 'title' | 'footer' | 'number' | 'name' | 'hp' | 'attack' | 'attackDamage' | 'bottom' | 'collector' | 'collectorRight' | 'collectorClassic' | 'collectorPromo' | 'collectorFused';
 
 export type OcrRegionResult = {
   region: OcrRegionName;

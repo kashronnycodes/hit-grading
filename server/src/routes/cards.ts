@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
 import { CardDetectionService } from '../services/cardDetectionService.js';
+import { ConditionGradingService } from '../services/conditionGradingService.js';
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -33,14 +34,28 @@ const publicCardMatchSchema = z.object({
   cardNumber: z.string().optional(),
   rarity: z.string().optional(),
   language: z.string().optional(),
+  setName: z.string().optional(),
+  setSeries: z.string().optional(),
   setOrSeries: z.string().optional(),
+  hp: z.string().optional(),
   imageUrl: z.string().optional(),
+  confidenceLabel: z.enum(['Strong match found', 'Strong match', 'Fallback match found', 'Review needed', 'Low confidence']).optional(),
+  confidenceScore: z.number().optional(),
+  setCode: z.string().optional(),
+  tcgplayerProductId: z.string().optional(),
   estimatedValue: z.object({
+    amount: z.number().optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
     market: z.number().optional(),
     low: z.number().optional(),
     mid: z.number().optional(),
     high: z.number().optional(),
-    currency: z.string().optional()
+    currency: z.string().optional(),
+    source: z.string().optional(),
+    label: z.string().optional(),
+    confidence: z.string().optional(),
+    note: z.string().optional()
   }).optional()
 });
 
@@ -51,7 +66,15 @@ const confirmBodySchema = z.object({
   confirmedCandidate: publicCardMatchSchema.optional()
 });
 
-export function createCardsRouter(cardDetectionService = new CardDetectionService()) {
+const correctBodySchema = z.object({
+  scanId: z.string().min(1),
+  cardName: z.string().optional(),
+  cardNumber: z.string().optional(),
+  setCode: z.string().optional(),
+  language: z.string().optional()
+});
+
+export function createCardsRouter(cardDetectionService = new CardDetectionService(), conditionGradingService = new ConditionGradingService()) {
   const router = Router();
 
   router.post(
@@ -130,6 +153,61 @@ export function createCardsRouter(cardDetectionService = new CardDetectionServic
       next(error);
     }
   });
+
+  router.post('/correct', async (req, res, next) => {
+    try {
+      const parsed = correctBodySchema.parse(req.body);
+      const updated = await cardDetectionService.correct(parsed);
+      if (!updated) {
+        res.status(404).json({ error: 'Scan record not found.' });
+        return;
+      }
+      res.json(updated);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post(
+    '/grade-condition',
+    upload.fields([
+      { name: 'frontImage', maxCount: 1 },
+      { name: 'backImage', maxCount: 1 }
+    ]),
+    async (req, res) => {
+      try {
+        console.log('[grade-condition] request received');
+        const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+        const frontImage = files?.frontImage?.[0];
+        const backImage = files?.backImage?.[0];
+        console.log('[grade-condition] front image received', Boolean(frontImage));
+        console.log('[grade-condition] back image received', Boolean(backImage));
+        if (!frontImage) {
+          return res.status(400).json({ error: 'A front image is required for condition grading.' });
+        }
+
+        const result = await conditionGradingService.analyze({
+          frontImageBuffer: frontImage.buffer,
+          backImageBuffer: backImage?.buffer,
+          debugMode: req.body?.debugMode === 'true',
+          identifiedCard: {
+            cardName: req.body?.cardName,
+            cardNumber: req.body?.cardNumber,
+            setCode: req.body?.setCode,
+            language: req.body?.language
+          }
+        });
+        console.log('[grade-condition] quality scores', result.debug?.frontQualityScore, result.debug?.backQualityScore);
+        console.log('[grade-condition] mode', result.mode);
+        console.log('[grade-condition] estimated grade', result.estimatedGrade);
+        console.log('[grade-condition] cap rules', result.capRulesApplied);
+        return res.json(result);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Condition grading failed.';
+        return res.status(500).json({ error: message });
+      }
+    }
+  );
 
   router.get('/scans', async (_req, res, next) => {
     try {

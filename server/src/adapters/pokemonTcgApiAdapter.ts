@@ -1,6 +1,7 @@
 import { env } from '../config/env.js';
 import type { ApiSearchDebugEntry, CardCandidate, CardDetails } from '../types/cards.js';
 import { requestJson, requestJsonWithMeta } from '../utils/http.js';
+import { normalizePokemonCardNumberForApi } from '../utils/pokemonText.js';
 import { BaseCardAdapter } from './base.js';
 
 type PokemonCardResponse = {
@@ -9,8 +10,10 @@ type PokemonCardResponse = {
     name: string;
     number?: string;
     rarity?: string;
+    hp?: string;
     images?: { small?: string; large?: string };
-    set?: { id?: string; name?: string };
+    set?: { id?: string; name?: string; series?: string };
+    releaseDate?: string;
     tcgplayer?: {
       prices?: Record<string, { low?: number; mid?: number; high?: number; market?: number }>;
     };
@@ -52,7 +55,8 @@ export class PokemonTcgApiAdapter extends BaseCardAdapter {
   }
 
   async searchByNumber(cardNumber: string, setCode?: string, _language?: string, debugCollector?: ApiSearchDebugEntry[]): Promise<CardCandidate[]> {
-    const parts = [`number:${cardNumber}`];
+    const apiCardNumber = normalizePokemonCardNumberForApi(cardNumber) ?? cardNumber;
+    const parts = [`number:${apiCardNumber}`];
     const normalizedSetId = normalizePokemonSetId(setCode);
     if (normalizedSetId) parts.push(`set.id:${normalizedSetId}`);
     const q = encodeURIComponent(parts.join(' '));
@@ -65,20 +69,32 @@ export class PokemonTcgApiAdapter extends BaseCardAdapter {
     debugCollector?: ApiSearchDebugEntry[]
   ): Promise<CardCandidate[]> {
     if (!hints.cardNumber || !hints.name) return [];
+    const apiCardNumber = normalizePokemonCardNumberForApi(hints.cardNumber) ?? hints.cardNumber;
     const wildcardPrefix = hints.name.replace(/[^a-z0-9]+/gi, '').slice(0, Math.min(4, hints.name.length));
     if (!wildcardPrefix) return [];
 
-    const parts = [`number:${hints.cardNumber}`, `name:${wildcardPrefix}*`];
     const normalizedSetId = normalizePokemonSetId(hints.setCode);
-    if (normalizedSetId) parts.push(`set.id:${normalizedSetId}`);
-    const query = parts.join(' ');
-    const data = await this.fetchCards(
-      `${env.POKEMON_TCG_API_BASE_URL}/cards?q=${encodeURIComponent(query)}&pageSize=12`,
-      debugCollector,
-      'number',
-      query
-    ).catch(() => []);
-    return data.map((card) => this.normalize(card));
+    const queries = [
+      [`name:${hints.name}`, `number:${apiCardNumber}`, normalizedSetId ? `set.id:${normalizedSetId}` : ''].filter(Boolean).join(' '),
+      [`name:${hints.name}`, `number:${apiCardNumber}`].join(' '),
+      [`number:${apiCardNumber}`, `name:${wildcardPrefix}*`, normalizedSetId ? `set.id:${normalizedSetId}` : ''].filter(Boolean).join(' ')
+    ];
+    const candidates: CardCandidate[] = [];
+    const seen = new Set<string>();
+    for (const query of queries) {
+      const data = await this.fetchCards(
+        `${env.POKEMON_TCG_API_BASE_URL}/cards?q=${encodeURIComponent(query)}&pageSize=10`,
+        debugCollector,
+        'number',
+        query
+      ).catch(() => []);
+      for (const card of data) {
+        if (seen.has(card.id)) continue;
+        seen.add(card.id);
+        candidates.push(this.normalize(card));
+      }
+    }
+    return candidates;
   }
 
   async searchByNameAndSet(name: string, setCode: string, debugCollector?: ApiSearchDebugEntry[]): Promise<CardCandidate[]> {
@@ -166,7 +182,7 @@ export class PokemonTcgApiAdapter extends BaseCardAdapter {
   }
 
   private normalize(card: PokemonCardResponse['data'][number]): CardDetails {
-    const tcgPlayerPrice = card.tcgplayer?.prices ? Object.values(card.tcgplayer.prices)[0] : undefined;
+    const tcgPlayerPrice = card.tcgplayer?.prices ? extractEstimatedValue(card.tcgplayer.prices) : undefined;
     const cardMarket = card.cardmarket?.prices;
     return {
       id: card.id,
@@ -177,14 +193,18 @@ export class PokemonTcgApiAdapter extends BaseCardAdapter {
       setCode: card.set?.id,
       cardNumber: card.number,
       rarity: card.rarity,
+      hp: card.hp,
+      releaseDate: card.releaseDate,
       imageUrl: card.images?.large ?? card.images?.small,
       prices:
+        tcgPlayerPrice ??
         this.buildPrice(
-          tcgPlayerPrice?.market ?? cardMarket?.averageSellPrice,
-          tcgPlayerPrice?.low ?? cardMarket?.lowPrice,
-          tcgPlayerPrice?.mid ?? cardMarket?.trendPrice,
-          tcgPlayerPrice?.high,
-          'USD'
+          cardMarket?.averageSellPrice,
+          cardMarket?.lowPrice,
+          cardMarket?.trendPrice,
+          undefined,
+          'USD',
+          cardMarket ? 'cardmarket' : undefined
         ) ?? undefined
     };
   }
@@ -192,6 +212,28 @@ export class PokemonTcgApiAdapter extends BaseCardAdapter {
   private headers() {
     return env.POKEMON_TCG_API_KEY ? { 'X-Api-Key': env.POKEMON_TCG_API_KEY } : undefined;
   }
+}
+
+function extractEstimatedValue(prices: Record<string, { low?: number; mid?: number; high?: number; market?: number }>): CardCandidate['prices'] | undefined {
+  const ordered = [
+    prices.holofoil?.market,
+    prices.normal?.market,
+    prices.reverseHolofoil?.market,
+    prices.unlimitedHolofoil?.market,
+    prices.firstEditionHolofoil?.market,
+    prices.holofoil?.mid,
+    prices.normal?.mid,
+    prices.reverseHolofoil?.mid
+  ];
+  const amount = ordered.find((value) => typeof value === 'number' && Number.isFinite(value));
+  if (!amount) return undefined;
+  return {
+    amount,
+    market: amount,
+    currency: 'USD',
+    source: 'tcgplayer',
+    label: `$${amount.toFixed(2)} market`
+  };
 }
 
 function normalizePokemonSetId(setCode?: string): string | undefined {
@@ -203,5 +245,6 @@ function normalizePokemonSetId(setCode?: string): string | undefined {
   if (compact.startsWith('sm')) return compact;
   if (compact.startsWith('xy')) return compact;
   if (compact.startsWith('bw')) return compact;
+  if (compact === 'baseset' || compact === 'base') return 'base1';
   return compact || undefined;
 }

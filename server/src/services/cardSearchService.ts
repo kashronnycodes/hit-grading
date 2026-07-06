@@ -7,6 +7,7 @@ import { TcgdexAdapter } from '../adapters/tcgdexAdapter.js';
 import { YgoprodeckAdapter } from '../adapters/ygoprodeckAdapter.js';
 import type { ApiSearchDebugEntry, CardApiAdapter, CardCandidate, ExtractedCardDetails, SupportedGame } from '../types/cards.js';
 import { normalizeForCompare, similarityScore } from '../utils/fuzzy.js';
+import { pokemonCardNumbersMatch } from '../utils/pokemonText.js';
 
 export class CardSearchService {
   private readonly pokemonApiAdapter = new PokemonTcgApiAdapter();
@@ -198,7 +199,7 @@ export class CardSearchService {
       }
     }
 
-    if (results.length === 0 && extracted.name && extracted.attackNameHint) {
+    if (results.length === 0 && !extracted.name && !extracted.cardNumber && !extracted.setCode && extracted.attackNameHint) {
       queriesUsed.push(`${this.pokemonApiAdapter.source}:attack:${extracted.attackNameHint}`);
       try {
         const byAttack = await this.pokemonApiAdapter.searchByAttackName(extracted.attackNameHint, apiCalls);
@@ -222,74 +223,96 @@ export class CardSearchService {
   }
 
   private rankCandidate(candidate: CardCandidate, extracted: ExtractedCardDetails, selectedGame?: string): { confidence: number; reasons: string[] } {
-    let score = 0.12;
-    const reasons: string[] = ['base candidate score +0.12'];
-    const normalizedExtractedName = normalizeForCompare(extracted.name);
-    const normalizedCandidateName = normalizeForCompare(candidate.name);
+    let score = 0;
+    const reasons: string[] = [];
+    const normalizedExtractedName = normalizeCardName(extracted.name);
+    const normalizedCandidateName = normalizeCardName(candidate.name);
 
     if (selectedGame && candidate.game === normalizeGame(selectedGame)) {
-      score += 0.1;
-      reasons.push('selected game matches candidate game +0.10');
+      reasons.push('selected game matches candidate game');
     }
-    if (extracted.cardNumber && candidate.cardNumber) {
-      if (extracted.cardNumber.toLowerCase() === candidate.cardNumber.toLowerCase()) {
-        score += 0.45;
-        reasons.push('collector/card number exact match +0.45');
+
+    if (normalizedExtractedName && normalizedCandidateName) {
+      if (normalizedCandidateName === normalizedExtractedName) {
+        score += 60;
+        reasons.push('exact normalized name match +60');
+      } else if (normalizedCandidateName.includes(normalizedExtractedName)) {
+        score += 45;
+        reasons.push('official card name contains OCR name +45');
       } else {
-        score += 0.14;
-        reasons.push('candidate has collector/card number but it is not exact +0.14');
-      }
-    }
-    if (extracted.setCode && candidate.setCode) {
-      if (extracted.setCode.toLowerCase() === candidate.setCode.toLowerCase()) {
-        score += 0.2;
-        reasons.push('set code exact match +0.20');
-      } else {
-        score += 0.04;
-        reasons.push('candidate has set code but it is not exact +0.04');
+        const nameSimilarity = similarityScore(extracted.name, candidate.name);
+        const boost = Math.round(nameSimilarity * 35);
+        score += boost;
+        reasons.push(`name similarity ${Math.round(nameSimilarity * 100)}% +${boost}`);
       }
     }
 
-    const nameSimilarity = similarityScore(extracted.name, candidate.name);
-    if (nameSimilarity > 0) {
-      const boost = nameSimilarity * 0.25;
-      score += boost;
-      reasons.push(`name similarity ${Math.round(nameSimilarity * 100)}% +${boost.toFixed(2)}`);
+    if (extracted.cardNumber && candidate.cardNumber) {
+      if (pokemonCardNumbersMatch(extracted.cardNumber, candidate.cardNumber)) {
+        score += 80;
+        reasons.push('collector/card number exact match +80');
+      } else {
+        score -= 100;
+        reasons.push('collector/card number conflicts -100');
+      }
     }
-    if (normalizedExtractedName && normalizedCandidateName.includes(normalizedExtractedName)) {
-      score += 0.08;
-      reasons.push('candidate name contains OCR card name +0.08');
+    if (extracted.setCode && isPokemonSetMatch(extracted.setCode, candidate)) {
+      score += 40;
+      reasons.push('set/promo series matches +40');
     }
-    if (normalizedExtractedName && normalizedCandidateName.startsWith(normalizedExtractedName.slice(0, Math.min(4, normalizedExtractedName.length)))) {
-      score += 0.05;
-      reasons.push('candidate name shares OCR prefix +0.05');
+    if (extracted.language) {
+      score += 10;
+      reasons.push('selected language available +10');
     }
+    if (extracted.hp && candidate.hp) {
+      if (String(extracted.hp) === String(candidate.hp)) {
+        score += 10;
+        reasons.push('Pokemon HP exact match +10');
+      } else {
+        reasons.push('candidate has HP but it is not exact');
+      }
+    }
+    if (extracted.year && candidate.releaseDate?.startsWith(extracted.year)) {
+      score += 10;
+      reasons.push('release year matches OCR copyright year +10');
+    }
+
     const raritySimilarity = similarityScore(extracted.rarity, candidate.rarity);
     if (raritySimilarity > 0) {
-      const boost = raritySimilarity * 0.05;
+      const boost = raritySimilarity * 5;
       score += boost;
-      reasons.push(`rarity similarity ${Math.round(raritySimilarity * 100)}% +${boost.toFixed(2)}`);
-    }
-    const languageSimilarity = similarityScore(extracted.language, candidate.language);
-    if (languageSimilarity > 0) {
-      const boost = languageSimilarity * 0.03;
-      score += boost;
-      reasons.push(`language similarity ${Math.round(languageSimilarity * 100)}% +${boost.toFixed(2)}`);
+      reasons.push(`rarity similarity ${Math.round(raritySimilarity * 100)}% +${boost.toFixed(0)}`);
     }
     if (!extracted.name && extracted.attackNameHint && candidate.source === 'pokemon-tcg-api') {
-      score += 0.1;
-      reasons.push('text match from Pokemon attack clue +0.10');
+      score += 15;
+      reasons.push('text match from Pokemon attack clue +15');
     }
 
-    // TODO: replace placeholder with image-embedding similarity score when pgvector retrieval is available.
-    score += 0.02;
-    reasons.push('image similarity placeholder +0.02');
-
+    let confidence = Math.min(0.99, score / 170);
+    if (extracted.name && !extracted.cardNumber && extracted.setCode) confidence = Math.min(confidence, 0.75);
+    if (extracted.name && !extracted.cardNumber && !extracted.setCode) confidence = Math.min(confidence, 0.65);
+    if (extracted.cardNumber && candidate.cardNumber && pokemonCardNumbersMatch(extracted.cardNumber, candidate.cardNumber) && extracted.setCode && isPokemonSetMatch(extracted.setCode, candidate)) {
+      confidence = Math.max(confidence, 0.88);
+      reasons.push('exact card number and set match boost to at least 0.88');
+    }
     return {
-      confidence: Math.min(0.99, Math.round(score * 100) / 100),
+      confidence: Math.round(confidence * 100) / 100,
       reasons
     };
   }
+}
+
+function normalizeCardName(name?: string): string {
+  return normalizeForCompare(name).replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function isPokemonSetMatch(setCode: string, candidate: CardCandidate): boolean {
+  const expected = setCode.toLowerCase().replace(/[^a-z0-9]+/g, '');
+  const candidateSet = `${candidate.setCode ?? ''} ${candidate.setName ?? ''}`.toLowerCase().replace(/[^a-z0-9]+/g, '');
+  if (expected.startsWith('svpen') || expected === 'svp') return candidateSet.includes('svp') || candidateSet.includes('scarletvioletpromo');
+  if (expected.startsWith('swsh')) return candidateSet.includes('swsh') || candidateSet.includes('swordshieldpromo');
+  if (expected === 'baseset' || expected === 'base1') return candidateSet.includes('base1') || candidateSet.includes('baseset');
+  return candidateSet.includes(expected);
 }
 
 function normalizeGame(value: string): SupportedGame {

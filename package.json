@@ -2,9 +2,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "dev:api": "tsx watch server/src/index.ts",
+    "dev:api": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs watch server/src/index.ts",
     "build": "vite build && tsc -p tsconfig.server.json",
     "build:api": "tsc -p tsconfig.server.json",
+    "sync:pokemon": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs scripts/syncPokemonMetadata.ts",
+    "pokemon:sync:diagnose": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs scripts/diagnosePokemonSync.ts",
+    "pokemon:cache:stats": "node ./node_modules/tsx/dist/cli.mjs scripts/pokemonCacheStats.ts",
     "preview": "vite preview --host 0.0.0.0",
     "start:api": "node dist-server/index.js"
   },
@@ -15,10 +18,10 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
-    "react": "latest",
-    "react-dom": "latest",
     "lucide-react": "latest",
     "multer": "^1.4.5-lts.2",
+    "react": "latest",
+    "react-dom": "latest",
     "sharp": "^0.34.2",
     "tesseract.js": "^6.0.1",
     "uuid": "^11.1.0",
@@ -31,6 +34,6 @@
     "@types/multer": "^1.4.12",
     "@types/node": "^22.15.29",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }

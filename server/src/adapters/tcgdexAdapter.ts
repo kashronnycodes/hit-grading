@@ -1,6 +1,8 @@
 import { env } from '../config/env.js';
 import type { ApiSearchDebugEntry, CardCandidate, CardDetails } from '../types/cards.js';
 import { requestJson, requestJsonWithMeta } from '../utils/http.js';
+import { normalizePokemonCardNumberForApi } from '../utils/pokemonText.js';
+import { classifyProviderError } from '../utils/providerErrors.js';
 import { BaseCardAdapter } from './base.js';
 
 type TcgdexCard = {
@@ -8,13 +10,19 @@ type TcgdexCard = {
   localId?: string;
   name: string;
   rarity?: string;
+  hp?: string | number;
   image?: string;
-  set?: { id?: string; name?: string };
+  set?: { id?: string; name?: string; cardCount?: { official?: number; total?: number } };
   pricing?: {
-    low?: number;
-    average?: number;
-    high?: number;
-    trend?: number;
+    tcgplayer?: Record<string, { lowPrice?: number; midPrice?: number; highPrice?: number; marketPrice?: number } | number | undefined>;
+    cardmarket?: {
+      avg?: number;
+      low?: number;
+      trend?: number;
+      'avg-holo'?: number;
+      'low-holo'?: number;
+      'trend-holo'?: number;
+    };
   };
 };
 
@@ -23,7 +31,8 @@ export class TcgdexAdapter extends BaseCardAdapter {
   readonly source = 'tcgdex';
 
   async searchByName(query: string, language = 'en', debugCollector?: ApiSearchDebugEntry[]): Promise<CardCandidate[]> {
-    const url = `${env.TCGDEX_BASE_URL}/${language}/cards?name=${encodeURIComponent(query)}`;
+    const languageCode = toTcgdexLanguage(language);
+    const url = `${env.TCGDEX_BASE_URL}/${languageCode}/cards?name=${encodeURIComponent(query)}`;
     try {
       const response = await requestJsonWithMeta<TcgdexCard[]>(
         url,
@@ -39,7 +48,7 @@ export class TcgdexAdapter extends BaseCardAdapter {
         resultCount: response.data.length,
         topMatchName: response.data[0]?.name
       });
-      const hydrated = await this.hydrateCards(response.data.slice(0, 5), language);
+      const hydrated = await this.hydrateCards(response.data.slice(0, 8), languageCode);
       return hydrated.map((card) => this.normalize(card));
     } catch (error) {
       debugCollector?.push({
@@ -47,7 +56,8 @@ export class TcgdexAdapter extends BaseCardAdapter {
         searchType: 'name',
         query,
         endpoint: url,
-        error: error instanceof Error ? error.message : 'Unknown adapter error'
+        error: error instanceof Error ? error.message : 'Unknown adapter error',
+        errorType: classifyProviderError(error)
       });
       throw error;
     }
@@ -55,8 +65,10 @@ export class TcgdexAdapter extends BaseCardAdapter {
 
   async searchByNumber(cardNumber: string, setCode?: string, language = 'en', debugCollector?: ApiSearchDebugEntry[]): Promise<CardCandidate[]> {
     if (!setCode) return [];
+    const languageCode = toTcgdexLanguage(language);
     const normalizedSetCode = normalizeTcgdexSetCode(setCode);
-    const url = `${env.TCGDEX_BASE_URL}/${language}/sets/${encodeURIComponent(normalizedSetCode)}/${encodeURIComponent(cardNumber)}`;
+    const localId = normalizePokemonCardNumberForApi(cardNumber) ?? cardNumber;
+    const url = `${env.TCGDEX_BASE_URL}/${languageCode}/sets/${encodeURIComponent(normalizedSetCode)}/${encodeURIComponent(localId)}`;
     try {
       const response = await requestJsonWithMeta<TcgdexCard>(
         url,
@@ -66,7 +78,7 @@ export class TcgdexAdapter extends BaseCardAdapter {
       debugCollector?.push({
         source: this.source,
         searchType: 'number',
-        query: `${cardNumber}${setCode ? ` ${setCode}` : ''}`,
+        query: `${localId}${setCode ? ` ${setCode}` : ''}`,
         endpoint: url,
         status: response.status,
         resultCount: response.data ? 1 : 0,
@@ -77,29 +89,38 @@ export class TcgdexAdapter extends BaseCardAdapter {
       debugCollector?.push({
         source: this.source,
         searchType: 'number',
-        query: `${cardNumber}${setCode ? ` ${setCode}` : ''}`,
+        query: `${localId}${setCode ? ` ${setCode}` : ''}`,
         endpoint: url,
-        error: error instanceof Error ? error.message : 'Unknown adapter error'
+        error: error instanceof Error ? error.message : 'Unknown adapter error',
+        errorType: classifyProviderError(error)
       });
       return [];
     }
   }
 
   async getCardById(id: string, language = 'en'): Promise<CardDetails | null> {
-    const url = `${env.TCGDEX_BASE_URL}/${language}/cards/${encodeURIComponent(id)}`;
+    const languageCode = toTcgdexLanguage(language);
+    const card = await this.fetchRawCardById(id, languageCode);
+    return card ? this.normalize(card) : null;
+  }
+
+  private async fetchRawCardById(id: string, language = 'en'): Promise<TcgdexCard | null> {
+    const languageCode = toTcgdexLanguage(language);
+    const url = `${env.TCGDEX_BASE_URL}/${languageCode}/cards/${encodeURIComponent(id)}`;
     try {
-      const card = await requestJson<TcgdexCard>(
+      return await requestJson<TcgdexCard>(
         url,
         {},
         { cacheKey: `${this.source}:card:${id}:${language}`, ttlMs: 1000 * 60 * 60 }
       );
-      return this.normalize(card);
     } catch {
       return null;
     }
   }
 
   private normalize(card: TcgdexCard): CardDetails {
+    const officialTotal = card.set?.cardCount?.official;
+    const displayNumber = card.localId && officialTotal ? `${card.localId}/${officialTotal}` : card.localId;
     return {
       id: card.id,
       source: this.source,
@@ -107,10 +128,11 @@ export class TcgdexAdapter extends BaseCardAdapter {
       name: card.name,
       setName: card.set?.name,
       setCode: card.set?.id,
-      cardNumber: card.localId,
+      cardNumber: displayNumber,
       rarity: card.rarity,
+      hp: card.hp !== undefined ? String(card.hp) : undefined,
       imageUrl: card.image,
-      prices: this.buildPrice(card.pricing?.trend, card.pricing?.low, card.pricing?.average, card.pricing?.high, 'USD')
+      prices: extractTcgdexPrice(card.pricing)
     };
   }
 
@@ -118,29 +140,7 @@ export class TcgdexAdapter extends BaseCardAdapter {
     const hydrated = await Promise.all(
       cards.map(async (card) => {
         try {
-          const detailed = await this.getCardById(card.id, language);
-          if (!detailed) return card;
-          return {
-            id: detailed.id,
-            localId: detailed.cardNumber,
-            name: detailed.name,
-            rarity: detailed.rarity,
-            image: detailed.imageUrl,
-            set: detailed.setCode || detailed.setName
-              ? {
-                  id: detailed.setCode,
-                  name: detailed.setName
-                }
-              : undefined,
-            pricing: detailed.prices
-              ? {
-                  low: detailed.prices.low,
-                  average: detailed.prices.mid,
-                  high: detailed.prices.high,
-                  trend: detailed.prices.market
-                }
-              : undefined
-          } satisfies TcgdexCard;
+          return await this.fetchRawCardById(card.id, language) ?? card;
         } catch {
           return card;
         }
@@ -153,5 +153,55 @@ export class TcgdexAdapter extends BaseCardAdapter {
 function normalizeTcgdexSetCode(setCode: string): string {
   const compact = setCode.toLowerCase().replace(/[^a-z0-9]+/g, '');
   if (compact.startsWith('svpen') || compact === 'svp') return 'svp';
+  if (compact === 'baseset' || compact === 'base1') return 'base1';
   return compact || setCode.toLowerCase();
+}
+
+function toTcgdexLanguage(language?: string): string {
+  const value = String(language ?? 'en').toLowerCase();
+  if (value.includes('english') || value === 'en') return 'en';
+  if (value.includes('french') || value === 'fr') return 'fr';
+  if (value.includes('spanish') || value === 'es') return 'es';
+  if (value.includes('german') || value === 'de') return 'de';
+  if (value.includes('italian') || value === 'it') return 'it';
+  if (value.includes('portuguese') || value === 'pt') return 'pt';
+  return value || 'en';
+}
+
+function extractTcgdexPrice(pricing?: TcgdexCard['pricing']): CardCandidate['prices'] | undefined {
+  const tcgplayer = pricing?.tcgplayer;
+  const variantValues = tcgplayer
+    ? Object.entries(tcgplayer)
+        .flatMap(([variant, value]) => typeof value === 'object' && value
+          ? [
+              { field: `pricing.tcgplayer.${variant}.marketPrice`, value: value.marketPrice },
+              { field: `pricing.tcgplayer.${variant}.midPrice`, value: value.midPrice },
+              { field: `pricing.tcgplayer.${variant}.lowPrice`, value: value.lowPrice },
+              { field: `pricing.tcgplayer.${variant}.highPrice`, value: value.highPrice }
+            ]
+          : [])
+    : [];
+  const tcgValue = variantValues.find((entry) => typeof entry.value === 'number' && Number.isFinite(entry.value));
+  if (tcgValue?.value) {
+    return {
+      amount: tcgValue.value,
+      market: tcgValue.value,
+      currency: 'USD',
+      source: 'tcgdex_tcgplayer',
+      label: `$${tcgValue.value.toFixed(2)} ${tcgValue.field.includes('market') ? 'market' : 'estimate'}`
+    };
+  }
+
+  const cardmarket = pricing?.cardmarket;
+  const marketValue = cardmarket?.trend ?? cardmarket?.['trend-holo'] ?? cardmarket?.avg ?? cardmarket?.['avg-holo'] ?? cardmarket?.low ?? cardmarket?.['low-holo'];
+  if (typeof marketValue === 'number' && Number.isFinite(marketValue)) {
+    return {
+      amount: marketValue,
+      market: marketValue,
+      currency: 'EUR',
+      source: 'tcgdex_cardmarket',
+      label: `€${marketValue.toFixed(2)} estimate`
+    };
+  }
+  return undefined;
 }

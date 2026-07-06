@@ -13,16 +13,25 @@ export abstract class BaseCardAdapter implements CardApiAdapter {
     low?: number | string | null,
     mid?: number | string | null,
     high?: number | string | null,
-    currency = 'USD'
+    currency = 'USD',
+    source?: string
   ): CardCandidate['prices'] | undefined {
     const numeric = [market, low, mid, high].some((value) => value !== null && value !== undefined && value !== '');
     if (!numeric) return undefined;
+    const marketValue = toNumber(market);
+    const midValue = toNumber(mid);
+    const lowValue = toNumber(low);
+    const highValue = toNumber(high);
+    const amount = marketValue ?? midValue ?? lowValue ?? highValue;
     return {
-      market: toNumber(market),
-      low: toNumber(low),
-      mid: toNumber(mid),
-      high: toNumber(high),
-      currency
+      amount,
+      market: marketValue,
+      low: lowValue,
+      mid: midValue,
+      high: highValue,
+      currency,
+      source,
+      label: amount ? `$${amount.toFixed(2)} ${marketValue ? 'market' : 'estimate'}` : undefined
     };
   }
 }

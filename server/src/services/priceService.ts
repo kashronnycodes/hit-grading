@@ -14,7 +14,8 @@ export class PriceService {
         low: existingPrices.low,
         mid: existingPrices.mid,
         high: existingPrices.high,
-        currency: existingPrices.currency ?? 'USD'
+        currency: existingPrices.currency ?? 'USD',
+        source: existingPrices.source
       }
     };
   }

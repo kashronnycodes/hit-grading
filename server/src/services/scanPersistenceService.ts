@@ -33,15 +33,52 @@ export class ScanPersistenceService {
     const updated: CardScanRecord = {
       ...existing,
       closestMatch: payload.confirmedCandidate ?? existing.closestMatch,
+      officialMatch: payload.confirmedCandidate ?? existing.officialMatch ?? existing.closestMatch ?? null,
       alternatives: existing.alternatives.filter(
         (candidate) => candidate.id !== payload.confirmedCardId || candidate.source !== payload.confirmedSource
       ),
+      identityStatus: 'identified',
+      confirmedIdentity: true,
+      userConfirmed: true,
+      needsBetterPhoto: false,
+      pricingEligible: true,
+      identity: {
+        status: 'identified',
+        confirmedIdentity: true,
+        needsUserConfirmation: false,
+        needsBetterPhoto: false,
+        pricingEligible: true,
+        confidence: payload.confirmedCandidate?.confidenceScore ?? existing.identity?.confidence,
+        reason: 'Card identity was manually confirmed by the user.',
+        warnings: existing.identity?.warnings
+      },
+      reason: 'Card identity was manually confirmed by the user.',
       confirmedCardId: payload.confirmedCardId,
       confirmedSource: payload.confirmedSource,
       confirmedAt: new Date().toISOString(),
-      needsUserConfirmation: false
+      needsUserConfirmation: false,
+      detectionNotes: [
+        ...(existing.detectionNotes ?? []),
+        'Card identity was manually confirmed by the user.'
+      ],
+      debug: existing.debug
+        ? {
+            ...existing.debug,
+            resultDecision: {
+              ...(existing.debug.resultDecision ?? existing.identity),
+              status: 'identified',
+              confirmedIdentity: true,
+              needsUserConfirmation: false,
+              needsBetterPhoto: false,
+              pricingEligible: true,
+              confidence: payload.confirmedCandidate?.confidenceScore ?? existing.debug.resultDecision?.confidence,
+              reason: 'Card identity was manually confirmed by the user.'
+            }
+          }
+        : existing.debug
     };
     await this.save(updated);
+    await this.saveTrainingRecord(updated, payload.confirmedCandidate);
     return updated;
   }
 
@@ -69,5 +106,29 @@ export class ScanPersistenceService {
 
   private getScanPath(scanId: string): string {
     return path.join(env.SCAN_DATA_DIR, `${scanId}.json`);
+  }
+
+  private async saveTrainingRecord(record: CardScanRecord, confirmedCandidate?: PublicCardMatch): Promise<void> {
+    const trainingPath = path.join(env.SCAN_DATA_DIR, '..', 'training-confirmed', `${record.scanId}.json`);
+    await writeJsonFile(trainingPath, {
+      scanId: record.scanId,
+      originalImagePath: record.rawImagePath,
+      croppedImagePath: record.normalizedImagePath,
+      backImagePath: record.backImagePath,
+      ocrRawText: record.debug?.ocrText ?? record.debug?.identification?.rawOcrText ?? null,
+      parsedOcrFields: record.detectedDetails,
+      selectedOfficialCard: confirmedCandidate ?? record.officialMatch ?? record.closestMatch ?? null,
+      conditionEstimate: record.conditionEstimate ?? null,
+      gradingBreakdown: record.conditionEstimate?.breakdown ?? null,
+      estimatedGrade: record.conditionEstimate?.estimatedGrade ?? null,
+      gradingConfidence: record.conditionEstimate?.confidence ?? null,
+      gradingWarnings: record.conditionEstimate?.warnings ?? [],
+      gradingCapRules: record.conditionEstimate?.capRulesApplied ?? [],
+      confidenceScore: (confirmedCandidate ?? record.officialMatch ?? record.closestMatch)?.confidenceScore ?? null,
+      sourceUsed: record.confirmedSource ?? (confirmedCandidate ?? record.officialMatch ?? record.closestMatch)?.source ?? null,
+      createdAt: record.createdAt,
+      confirmedAt: record.confirmedAt,
+      manuallyCorrected: Boolean(record.manuallyCorrected || record.correctedFields?.manuallyCorrected)
+    });
   }
 }

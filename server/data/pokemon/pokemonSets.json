@@ -1,0 +1,3040 @@
+[
+  {
+    "id": "base4",
+    "provider": "tcgdex",
+    "name": "Base Set 2",
+    "normalizedName": "base set 2",
+    "setCode": "base4",
+    "series": "Base",
+    "language": "en",
+    "releaseDate": "2000-02-24",
+    "cardCount": {
+      "official": 130,
+      "total": null
+    }
+  },
+  {
+    "id": "base1",
+    "provider": "tcgdex",
+    "name": "Base Set",
+    "normalizedName": "base set",
+    "setCode": "base1",
+    "series": "Base",
+    "language": "en",
+    "releaseDate": "1999-01-09",
+    "cardCount": {
+      "official": 102,
+      "total": null
+    }
+  },
+  {
+    "id": "base3",
+    "provider": "tcgdex",
+    "name": "Fossil",
+    "normalizedName": "fossil",
+    "setCode": "base3",
+    "series": "Base",
+    "language": "en",
+    "releaseDate": "1999-10-10",
+    "cardCount": {
+      "official": 62,
+      "total": null
+    }
+  },
+  {
+    "id": "base2",
+    "provider": "tcgdex",
+    "name": "Jungle",
+    "normalizedName": "jungle",
+    "setCode": "base2",
+    "series": "Base",
+    "language": "en",
+    "releaseDate": "1999-06-16",
+    "cardCount": {
+      "official": 64,
+      "total": null
+    }
+  },
+  {
+    "id": "base5",
+    "provider": "tcgdex",
+    "name": "Team Rocket",
+    "normalizedName": "team rocket",
+    "setCode": "base5",
+    "series": "Base",
+    "language": "en",
+    "releaseDate": "2000-04-24",
+    "cardCount": {
+      "official": 82,
+      "total": null
+    }
+  },
+  {
+    "id": "wp",
+    "provider": "tcgdex",
+    "name": "W Promotional",
+    "normalizedName": "w promotional",
+    "setCode": "wp",
+    "series": "Base",
+    "language": "en",
+    "releaseDate": "1999-09-01",
+    "cardCount": {
+      "official": 7,
+      "total": null
+    }
+  },
+  {
+    "id": "basep",
+    "provider": "tcgdex",
+    "name": "Wizards Black Star Promos",
+    "normalizedName": "wizards black star promos",
+    "setCode": "basep",
+    "series": "Base",
+    "language": "en",
+    "releaseDate": "1999-07-01",
+    "cardCount": {
+      "official": 53,
+      "total": null
+    }
+  },
+  {
+    "id": "bw1",
+    "provider": "tcgdex",
+    "name": "Black & White",
+    "normalizedName": "black white",
+    "setCode": "bw1",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2011-04-25",
+    "cardCount": {
+      "official": 114,
+      "total": null
+    }
+  },
+  {
+    "id": "bw7",
+    "provider": "tcgdex",
+    "name": "Boundaries Crossed",
+    "normalizedName": "boundaries crossed",
+    "setCode": "bw7",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2012-11-07",
+    "cardCount": {
+      "official": 149,
+      "total": null
+    }
+  },
+  {
+    "id": "bwp",
+    "provider": "tcgdex",
+    "name": "BW Black Star Promos",
+    "normalizedName": "bw black star promos",
+    "setCode": "bwp",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2011-04-26",
+    "cardCount": {
+      "official": 101,
+      "total": null
+    }
+  },
+  {
+    "id": "bw5",
+    "provider": "tcgdex",
+    "name": "Dark Explorers",
+    "normalizedName": "dark explorers",
+    "setCode": "bw5",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2012-05-09",
+    "cardCount": {
+      "official": 108,
+      "total": null
+    }
+  },
+  {
+    "id": "dv1",
+    "provider": "tcgdex",
+    "name": "Dragon Vault",
+    "normalizedName": "dragon vault",
+    "setCode": "dv1",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2012-10-05",
+    "cardCount": {
+      "official": 20,
+      "total": null
+    }
+  },
+  {
+    "id": "bw6",
+    "provider": "tcgdex",
+    "name": "Dragons Exalted",
+    "normalizedName": "dragons exalted",
+    "setCode": "bw6",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2012-08-15",
+    "cardCount": {
+      "official": 124,
+      "total": null
+    }
+  },
+  {
+    "id": "bw2",
+    "provider": "tcgdex",
+    "name": "Emerging Powers",
+    "normalizedName": "emerging powers",
+    "setCode": "bw2",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2011-08-31",
+    "cardCount": {
+      "official": 98,
+      "total": null
+    }
+  },
+  {
+    "id": "bw11",
+    "provider": "tcgdex",
+    "name": "Legendary Treasures",
+    "normalizedName": "legendary treasures",
+    "setCode": "bw11",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2013-11-06",
+    "cardCount": {
+      "official": 113,
+      "total": null
+    }
+  },
+  {
+    "id": "bw4",
+    "provider": "tcgdex",
+    "name": "Next Destinies",
+    "normalizedName": "next destinies",
+    "setCode": "bw4",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2012-02-08",
+    "cardCount": {
+      "official": 99,
+      "total": null
+    }
+  },
+  {
+    "id": "bw3",
+    "provider": "tcgdex",
+    "name": "Noble Victories",
+    "normalizedName": "noble victories",
+    "setCode": "bw3",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2011-11-16",
+    "cardCount": {
+      "official": 101,
+      "total": null
+    }
+  },
+  {
+    "id": "bw10",
+    "provider": "tcgdex",
+    "name": "Plasma Blast",
+    "normalizedName": "plasma blast",
+    "setCode": "bw10",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2013-08-14",
+    "cardCount": {
+      "official": 101,
+      "total": null
+    }
+  },
+  {
+    "id": "bw9",
+    "provider": "tcgdex",
+    "name": "Plasma Freeze",
+    "normalizedName": "plasma freeze",
+    "setCode": "bw9",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2013-05-08",
+    "cardCount": {
+      "official": 116,
+      "total": null
+    }
+  },
+  {
+    "id": "bw8",
+    "provider": "tcgdex",
+    "name": "Plasma Storm",
+    "normalizedName": "plasma storm",
+    "setCode": "bw8",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2013-02-06",
+    "cardCount": {
+      "official": 135,
+      "total": null
+    }
+  },
+  {
+    "id": "rc",
+    "provider": "tcgdex",
+    "name": "Radiant Collection",
+    "normalizedName": "radiant collection",
+    "setCode": "rc",
+    "series": "Black & White",
+    "language": "en",
+    "releaseDate": "2013-11-06",
+    "cardCount": {
+      "official": 25,
+      "total": null
+    }
+  },
+  {
+    "id": "col1",
+    "provider": "tcgdex",
+    "name": "Call of Legends",
+    "normalizedName": "call of legends",
+    "setCode": "col1",
+    "series": "Call of Legends",
+    "language": "en",
+    "releaseDate": "2011-02-09",
+    "cardCount": {
+      "official": 95,
+      "total": null
+    }
+  },
+  {
+    "id": "dp1",
+    "provider": "tcgdex",
+    "name": "Diamond & Pearl",
+    "normalizedName": "diamond pearl",
+    "setCode": "dp1",
+    "series": "Diamond & Pearl",
+    "language": "en",
+    "releaseDate": "2007-05-01",
+    "cardCount": {
+      "official": 130,
+      "total": null
+    }
+  },
+  {
+    "id": "dpp",
+    "provider": "tcgdex",
+    "name": "DP Black Star Promos",
+    "normalizedName": "dp black star promos",
+    "setCode": "dpp",
+    "series": "Diamond & Pearl",
+    "language": "en",
+    "releaseDate": "2007-05-01",
+    "cardCount": {
+      "official": 56,
+      "total": null
+    }
+  },
+  {
+    "id": "dp4",
+    "provider": "tcgdex",
+    "name": "Great Encounters",
+    "normalizedName": "great encounters",
+    "setCode": "dp4",
+    "series": "Diamond & Pearl",
+    "language": "en",
+    "releaseDate": "2008-02-01",
+    "cardCount": {
+      "official": 106,
+      "total": null
+    }
+  },
+  {
+    "id": "dp6",
+    "provider": "tcgdex",
+    "name": "Legends Awakened",
+    "normalizedName": "legends awakened",
+    "setCode": "dp6",
+    "series": "Diamond & Pearl",
+    "language": "en",
+    "releaseDate": "2008-08-01",
+    "cardCount": {
+      "official": 146,
+      "total": null
+    }
+  },
+  {
+    "id": "dp5",
+    "provider": "tcgdex",
+    "name": "Majestic Dawn",
+    "normalizedName": "majestic dawn",
+    "setCode": "dp5",
+    "series": "Diamond & Pearl",
+    "language": "en",
+    "releaseDate": "2008-05-01",
+    "cardCount": {
+      "official": 100,
+      "total": null
+    }
+  },
+  {
+    "id": "dp2",
+    "provider": "tcgdex",
+    "name": "Mysterious Treasures",
+    "normalizedName": "mysterious treasures",
+    "setCode": "dp2",
+    "series": "Diamond & Pearl",
+    "language": "en",
+    "releaseDate": "2007-08-01",
+    "cardCount": {
+      "official": 123,
+      "total": null
+    }
+  },
+  {
+    "id": "dp3",
+    "provider": "tcgdex",
+    "name": "Secret Wonders",
+    "normalizedName": "secret wonders",
+    "setCode": "dp3",
+    "series": "Diamond & Pearl",
+    "language": "en",
+    "releaseDate": "2007-11-01",
+    "cardCount": {
+      "official": 132,
+      "total": null
+    }
+  },
+  {
+    "id": "dp7",
+    "provider": "tcgdex",
+    "name": "Stormfront",
+    "normalizedName": "stormfront",
+    "setCode": "dp7",
+    "series": "Diamond & Pearl",
+    "language": "en",
+    "releaseDate": "2008-11-01",
+    "cardCount": {
+      "official": 100,
+      "total": null
+    }
+  },
+  {
+    "id": "ecard2",
+    "provider": "tcgdex",
+    "name": "Aquapolis",
+    "normalizedName": "aquapolis",
+    "setCode": "ecard2",
+    "series": "E-Card",
+    "language": "en",
+    "releaseDate": "2003-01-15",
+    "cardCount": {
+      "official": 147,
+      "total": null
+    }
+  },
+  {
+    "id": "bog",
+    "provider": "tcgdex",
+    "name": "Best of game",
+    "normalizedName": "best of game",
+    "setCode": "bog",
+    "series": "E-Card",
+    "language": "en",
+    "releaseDate": "2002-12-01",
+    "cardCount": {
+      "official": 9,
+      "total": null
+    }
+  },
+  {
+    "id": "ecard1",
+    "provider": "tcgdex",
+    "name": "Expedition Base Set",
+    "normalizedName": "expedition base set",
+    "setCode": "ecard1",
+    "series": "E-Card",
+    "language": "en",
+    "releaseDate": "2002-09-15",
+    "cardCount": {
+      "official": 165,
+      "total": null
+    }
+  },
+  {
+    "id": "sp",
+    "provider": "tcgdex",
+    "name": "Sample",
+    "normalizedName": "sample",
+    "setCode": "sp",
+    "series": "E-Card",
+    "language": "en",
+    "releaseDate": "2002-08-01",
+    "cardCount": {
+      "official": 10,
+      "total": null
+    }
+  },
+  {
+    "id": "ecard3",
+    "provider": "tcgdex",
+    "name": "Skyridge",
+    "normalizedName": "skyridge",
+    "setCode": "ecard3",
+    "series": "E-Card",
+    "language": "en",
+    "releaseDate": "2003-05-12",
+    "cardCount": {
+      "official": 144,
+      "total": null
+    }
+  },
+  {
+    "id": "ex14",
+    "provider": "tcgdex",
+    "name": "Crystal Guardians",
+    "normalizedName": "crystal guardians",
+    "setCode": "ex14",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2006-08-30",
+    "cardCount": {
+      "official": 100,
+      "total": null
+    }
+  },
+  {
+    "id": "ex11",
+    "provider": "tcgdex",
+    "name": "Delta Species",
+    "normalizedName": "delta species",
+    "setCode": "ex11",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2005-10-31",
+    "cardCount": {
+      "official": 113,
+      "total": null
+    }
+  },
+  {
+    "id": "ex8",
+    "provider": "tcgdex",
+    "name": "Deoxys",
+    "normalizedName": "deoxys",
+    "setCode": "ex8",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2005-02-01",
+    "cardCount": {
+      "official": 107,
+      "total": null
+    }
+  },
+  {
+    "id": "ex15",
+    "provider": "tcgdex",
+    "name": "Dragon Frontiers",
+    "normalizedName": "dragon frontiers",
+    "setCode": "ex15",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2006-11-08",
+    "cardCount": {
+      "official": 101,
+      "total": null
+    }
+  },
+  {
+    "id": "ex3",
+    "provider": "tcgdex",
+    "name": "Dragon",
+    "normalizedName": "dragon",
+    "setCode": "ex3",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2003-11-24",
+    "cardCount": {
+      "official": 97,
+      "total": null
+    }
+  },
+  {
+    "id": "ex9",
+    "provider": "tcgdex",
+    "name": "Emerald",
+    "normalizedName": "emerald",
+    "setCode": "ex9",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2005-05-09",
+    "cardCount": {
+      "official": 106,
+      "total": null
+    }
+  },
+  {
+    "id": "ex6",
+    "provider": "tcgdex",
+    "name": "FireRed & LeafGreen",
+    "normalizedName": "firered leafgreen",
+    "setCode": "ex6",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2004-09-01",
+    "cardCount": {
+      "official": 112,
+      "total": null
+    }
+  },
+  {
+    "id": "ex5",
+    "provider": "tcgdex",
+    "name": "Hidden Legends",
+    "normalizedName": "hidden legends",
+    "setCode": "ex5",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2004-06-01",
+    "cardCount": {
+      "official": 101,
+      "total": null
+    }
+  },
+  {
+    "id": "ex13",
+    "provider": "tcgdex",
+    "name": "Holon Phantoms",
+    "normalizedName": "holon phantoms",
+    "setCode": "ex13",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2006-05-03",
+    "cardCount": {
+      "official": 110,
+      "total": null
+    }
+  },
+  {
+    "id": "ex12",
+    "provider": "tcgdex",
+    "name": "Legend Maker",
+    "normalizedName": "legend maker",
+    "setCode": "ex12",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2006-02-13",
+    "cardCount": {
+      "official": 92,
+      "total": null
+    }
+  },
+  {
+    "id": "ex5.5",
+    "provider": "tcgdex",
+    "name": "Poké Card Creator Pack",
+    "normalizedName": "poke card creator pack",
+    "setCode": "ex55",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2004-07-01",
+    "cardCount": {
+      "official": 5,
+      "total": null
+    }
+  },
+  {
+    "id": "ex16",
+    "provider": "tcgdex",
+    "name": "Power Keepers",
+    "normalizedName": "power keepers",
+    "setCode": "ex16",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2007-02-17",
+    "cardCount": {
+      "official": 108,
+      "total": null
+    }
+  },
+  {
+    "id": "ex1",
+    "provider": "tcgdex",
+    "name": "Ruby & Sapphire",
+    "normalizedName": "ruby sapphire",
+    "setCode": "ex1",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2003-07-01",
+    "cardCount": {
+      "official": 109,
+      "total": null
+    }
+  },
+  {
+    "id": "ex2",
+    "provider": "tcgdex",
+    "name": "Sandstorm",
+    "normalizedName": "sandstorm",
+    "setCode": "ex2",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2003-09-18",
+    "cardCount": {
+      "official": 100,
+      "total": null
+    }
+  },
+  {
+    "id": "ex4",
+    "provider": "tcgdex",
+    "name": "Team Magma vs Team Aqua",
+    "normalizedName": "team magma vs team aqua",
+    "setCode": "ex4",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2004-03-01",
+    "cardCount": {
+      "official": 95,
+      "total": null
+    }
+  },
+  {
+    "id": "ex7",
+    "provider": "tcgdex",
+    "name": "Team Rocket Returns",
+    "normalizedName": "team rocket returns",
+    "setCode": "ex7",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2004-11-01",
+    "cardCount": {
+      "official": 109,
+      "total": null
+    }
+  },
+  {
+    "id": "exu",
+    "provider": "tcgdex",
+    "name": "Unseen Forces Unown Collection",
+    "normalizedName": "unseen forces unown collection",
+    "setCode": "exu",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2005-08-22",
+    "cardCount": {
+      "official": 28,
+      "total": null
+    }
+  },
+  {
+    "id": "ex10",
+    "provider": "tcgdex",
+    "name": "Unseen Forces",
+    "normalizedName": "unseen forces",
+    "setCode": "ex10",
+    "series": "EX",
+    "language": "en",
+    "releaseDate": "2005-08-22",
+    "cardCount": {
+      "official": 115,
+      "total": null
+    }
+  },
+  {
+    "id": "gym2",
+    "provider": "tcgdex",
+    "name": "Gym Challenge",
+    "normalizedName": "gym challenge",
+    "setCode": "gym2",
+    "series": "Gym",
+    "language": "en",
+    "releaseDate": "2000-10-16",
+    "cardCount": {
+      "official": 132,
+      "total": null
+    }
+  },
+  {
+    "id": "gym1",
+    "provider": "tcgdex",
+    "name": "Gym Heroes",
+    "normalizedName": "gym heroes",
+    "setCode": "gym1",
+    "series": "Gym",
+    "language": "en",
+    "releaseDate": "2000-08-14",
+    "cardCount": {
+      "official": 132,
+      "total": null
+    }
+  },
+  {
+    "id": "hgss1",
+    "provider": "tcgdex",
+    "name": "HeartGold SoulSilver",
+    "normalizedName": "heartgold soulsilver",
+    "setCode": "hgss1",
+    "series": "HeartGold & SoulSilver",
+    "language": "en",
+    "releaseDate": "2010-02-10",
+    "cardCount": {
+      "official": 123,
+      "total": null
+    }
+  },
+  {
+    "id": "hgssp",
+    "provider": "tcgdex",
+    "name": "HGSS Black Star Promos",
+    "normalizedName": "hgss black star promos",
+    "setCode": "hgssp",
+    "series": "HeartGold & SoulSilver",
+    "language": "en",
+    "releaseDate": "2010-02-11",
+    "cardCount": {
+      "official": 25,
+      "total": null
+    }
+  },
+  {
+    "id": "hgss4",
+    "provider": "tcgdex",
+    "name": "Triumphant",
+    "normalizedName": "triumphant",
+    "setCode": "hgss4",
+    "series": "HeartGold & SoulSilver",
+    "language": "en",
+    "releaseDate": "2010-11-03",
+    "cardCount": {
+      "official": 102,
+      "total": null
+    }
+  },
+  {
+    "id": "hgss3",
+    "provider": "tcgdex",
+    "name": "Undaunted",
+    "normalizedName": "undaunted",
+    "setCode": "hgss3",
+    "series": "HeartGold & SoulSilver",
+    "language": "en",
+    "releaseDate": "2010-08-18",
+    "cardCount": {
+      "official": 90,
+      "total": null
+    }
+  },
+  {
+    "id": "hgss2",
+    "provider": "tcgdex",
+    "name": "Unleashed",
+    "normalizedName": "unleashed",
+    "setCode": "hgss2",
+    "series": "HeartGold & SoulSilver",
+    "language": "en",
+    "releaseDate": "2010-05-12",
+    "cardCount": {
+      "official": 95,
+      "total": null
+    }
+  },
+  {
+    "id": "lc",
+    "provider": "tcgdex",
+    "name": "Legendary Collection",
+    "normalizedName": "legendary collection",
+    "setCode": "lc",
+    "series": "Legendary Collection",
+    "language": "en",
+    "releaseDate": "2002-05-24",
+    "cardCount": {
+      "official": 110,
+      "total": null
+    }
+  },
+  {
+    "id": "2013bw",
+    "provider": "tcgdex",
+    "name": "Collection McDonald's 2013",
+    "normalizedName": "collection mcdonald s 2013",
+    "setCode": "2013bw",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2013-11-01",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2018sm-fr",
+    "provider": "tcgdex",
+    "name": "Collection McDonald's 2018",
+    "normalizedName": "collection mcdonald s 2018",
+    "setCode": "2018smfr",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2018-06-13",
+    "cardCount": {
+      "official": 40,
+      "total": null
+    }
+  },
+  {
+    "id": "2019sm-fr",
+    "provider": "tcgdex",
+    "name": "Collection McDonald's 2019",
+    "normalizedName": "collection mcdonald s 2019",
+    "setCode": "2019smfr",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2019-10-30",
+    "cardCount": {
+      "official": 40,
+      "total": null
+    }
+  },
+  {
+    "id": "2011bw",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2011bw",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2011-06-17",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2012bw",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2012bw",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2012-06-15",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2014xy",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2014xy",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2014-05-23",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2015xy",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2015xy",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2015-11-27",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2016xy",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2016xy",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2016-08-20",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2017sm",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2017sm",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2017-08-03",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2018sm",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2018sm",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2018-10-19",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2019sm",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2019sm",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2019-10-15",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "2021swsh",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2021swsh",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2021-02-09",
+    "cardCount": {
+      "official": 25,
+      "total": null
+    }
+  },
+  {
+    "id": "2022swsh",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2022swsh",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2022-08-03",
+    "cardCount": {
+      "official": 15,
+      "total": null
+    }
+  },
+  {
+    "id": "2023sv",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2023sv",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2023-08-01",
+    "cardCount": {
+      "official": 15,
+      "total": null
+    }
+  },
+  {
+    "id": "2024sv",
+    "provider": "tcgdex",
+    "name": "McDonald",
+    "normalizedName": "mcdonald",
+    "setCode": "2024sv",
+    "series": "McDonald",
+    "language": "en",
+    "releaseDate": "2024-12-04",
+    "cardCount": {
+      "official": 15,
+      "total": null
+    }
+  },
+  {
+    "id": "me02.5",
+    "provider": "tcgdex",
+    "name": "Ascended Heroes",
+    "normalizedName": "ascended heroes",
+    "setCode": "me025",
+    "series": "Mega Evolution",
+    "language": "en",
+    "releaseDate": "2026-01-30",
+    "cardCount": {
+      "official": 217,
+      "total": null
+    }
+  },
+  {
+    "id": "me04",
+    "provider": "tcgdex",
+    "name": "Chaos Rising",
+    "normalizedName": "chaos rising",
+    "setCode": "me04",
+    "series": "Mega Evolution",
+    "language": "en",
+    "releaseDate": "2026-05-22",
+    "cardCount": {
+      "official": 86,
+      "total": null
+    }
+  },
+  {
+    "id": "mee",
+    "provider": "tcgdex",
+    "name": "Mega Evolution Energy",
+    "normalizedName": "mega evolution energy",
+    "setCode": "mee",
+    "series": "Mega Evolution",
+    "language": "en",
+    "releaseDate": "2025-09-25",
+    "cardCount": {
+      "official": 8,
+      "total": null
+    }
+  },
+  {
+    "id": "me01",
+    "provider": "tcgdex",
+    "name": "Mega Evolution",
+    "normalizedName": "mega evolution",
+    "setCode": "me01",
+    "series": "Mega Evolution",
+    "language": "en",
+    "releaseDate": "2025-09-26",
+    "cardCount": {
+      "official": 132,
+      "total": null
+    }
+  },
+  {
+    "id": "mep",
+    "provider": "tcgdex",
+    "name": "MEP Black Star Promos",
+    "normalizedName": "mep black star promos",
+    "setCode": "mep",
+    "series": "Mega Evolution",
+    "language": "en",
+    "releaseDate": "2025-09-26",
+    "cardCount": {
+      "official": 0,
+      "total": null
+    }
+  },
+  {
+    "id": "me03",
+    "provider": "tcgdex",
+    "name": "Perfect Order",
+    "normalizedName": "perfect order",
+    "setCode": "me03",
+    "series": "Mega Evolution",
+    "language": "en",
+    "releaseDate": "2026-03-27",
+    "cardCount": {
+      "official": 88,
+      "total": null
+    }
+  },
+  {
+    "id": "me02",
+    "provider": "tcgdex",
+    "name": "Phantasmal Flames",
+    "normalizedName": "phantasmal flames",
+    "setCode": "me02",
+    "series": "Mega Evolution",
+    "language": "en",
+    "releaseDate": "2025-11-14",
+    "cardCount": {
+      "official": 94,
+      "total": null
+    }
+  },
+  {
+    "id": "jumbo",
+    "provider": "tcgdex",
+    "name": "Jumbo cards",
+    "normalizedName": "jumbo cards",
+    "setCode": "jumbo",
+    "series": "Miscellaneous",
+    "language": "en",
+    "releaseDate": "2000-02-01",
+    "cardCount": {
+      "official": 160,
+      "total": null
+    }
+  },
+  {
+    "id": "neo4",
+    "provider": "tcgdex",
+    "name": "Neo Destiny",
+    "normalizedName": "neo destiny",
+    "setCode": "neo4",
+    "series": "Neo",
+    "language": "en",
+    "releaseDate": "2002-02-28",
+    "cardCount": {
+      "official": 105,
+      "total": null
+    }
+  },
+  {
+    "id": "neo2",
+    "provider": "tcgdex",
+    "name": "Neo Discovery",
+    "normalizedName": "neo discovery",
+    "setCode": "neo2",
+    "series": "Neo",
+    "language": "en",
+    "releaseDate": "2001-06-01",
+    "cardCount": {
+      "official": 75,
+      "total": null
+    }
+  },
+  {
+    "id": "neo1",
+    "provider": "tcgdex",
+    "name": "Neo Genesis",
+    "normalizedName": "neo genesis",
+    "setCode": "neo1",
+    "series": "Neo",
+    "language": "en",
+    "releaseDate": "2000-12-16",
+    "cardCount": {
+      "official": 111,
+      "total": null
+    }
+  },
+  {
+    "id": "neo3",
+    "provider": "tcgdex",
+    "name": "Neo Revelation",
+    "normalizedName": "neo revelation",
+    "setCode": "neo3",
+    "series": "Neo",
+    "language": "en",
+    "releaseDate": "2001-09-21",
+    "cardCount": {
+      "official": 64,
+      "total": null
+    }
+  },
+  {
+    "id": "si1",
+    "provider": "tcgdex",
+    "name": "Southern Islands",
+    "normalizedName": "southern islands",
+    "setCode": "si1",
+    "series": "Neo",
+    "language": "en",
+    "releaseDate": "2001-07-31",
+    "cardCount": {
+      "official": 18,
+      "total": null
+    }
+  },
+  {
+    "id": "pl4",
+    "provider": "tcgdex",
+    "name": "Arceus",
+    "normalizedName": "arceus",
+    "setCode": "pl4",
+    "series": "Platinum",
+    "language": "en",
+    "releaseDate": "2009-11-04",
+    "cardCount": {
+      "official": 99,
+      "total": null
+    }
+  },
+  {
+    "id": "pl1",
+    "provider": "tcgdex",
+    "name": "Platinum",
+    "normalizedName": "platinum",
+    "setCode": "pl1",
+    "series": "Platinum",
+    "language": "en",
+    "releaseDate": "2009-02-11",
+    "cardCount": {
+      "official": 127,
+      "total": null
+    }
+  },
+  {
+    "id": "ru1",
+    "provider": "tcgdex",
+    "name": "Pokémon Rumble",
+    "normalizedName": "pokemon rumble",
+    "setCode": "ru1",
+    "series": "Platinum",
+    "language": "en",
+    "releaseDate": "2009-12-02",
+    "cardCount": {
+      "official": 16,
+      "total": null
+    }
+  },
+  {
+    "id": "pl2",
+    "provider": "tcgdex",
+    "name": "Rising Rivals",
+    "normalizedName": "rising rivals",
+    "setCode": "pl2",
+    "series": "Platinum",
+    "language": "en",
+    "releaseDate": "2009-05-16",
+    "cardCount": {
+      "official": 111,
+      "total": null
+    }
+  },
+  {
+    "id": "pl3",
+    "provider": "tcgdex",
+    "name": "Supreme Victors",
+    "normalizedName": "supreme victors",
+    "setCode": "pl3",
+    "series": "Platinum",
+    "language": "en",
+    "releaseDate": "2009-08-19",
+    "cardCount": {
+      "official": 147,
+      "total": null
+    }
+  },
+  {
+    "id": "A3",
+    "provider": "tcgdex",
+    "name": "Celestial Guardians",
+    "normalizedName": "celestial guardians",
+    "setCode": "a3",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-04-30",
+    "cardCount": {
+      "official": 155,
+      "total": null
+    }
+  },
+  {
+    "id": "B1a",
+    "provider": "tcgdex",
+    "name": "Crimson Blaze",
+    "normalizedName": "crimson blaze",
+    "setCode": "b1a",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-12-17",
+    "cardCount": {
+      "official": 69,
+      "total": null
+    }
+  },
+  {
+    "id": "A3b",
+    "provider": "tcgdex",
+    "name": "Eevee Grove",
+    "normalizedName": "eevee grove",
+    "setCode": "a3b",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-06-26",
+    "cardCount": {
+      "official": 69,
+      "total": null
+    }
+  },
+  {
+    "id": "A3a",
+    "provider": "tcgdex",
+    "name": "Extradimensional Crisis",
+    "normalizedName": "extradimensional crisis",
+    "setCode": "a3a",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-05-29",
+    "cardCount": {
+      "official": 69,
+      "total": null
+    }
+  },
+  {
+    "id": "B2",
+    "provider": "tcgdex",
+    "name": "Fantastical Parade",
+    "normalizedName": "fantastical parade",
+    "setCode": "b2",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2026-01-29",
+    "cardCount": {
+      "official": 155,
+      "total": null
+    }
+  },
+  {
+    "id": "A1",
+    "provider": "tcgdex",
+    "name": "Genetic Apex",
+    "normalizedName": "genetic apex",
+    "setCode": "a1",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2024-10-30",
+    "cardCount": {
+      "official": 226,
+      "total": null
+    }
+  },
+  {
+    "id": "B1",
+    "provider": "tcgdex",
+    "name": "Mega Rising",
+    "normalizedName": "mega rising",
+    "setCode": "b1",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-10-30",
+    "cardCount": {
+      "official": 226,
+      "total": null
+    }
+  },
+  {
+    "id": "A1a",
+    "provider": "tcgdex",
+    "name": "Mythical Island",
+    "normalizedName": "mythical island",
+    "setCode": "a1a",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2024-12-17",
+    "cardCount": {
+      "official": 68,
+      "total": null
+    }
+  },
+  {
+    "id": "B2a",
+    "provider": "tcgdex",
+    "name": "Paldean Wonders",
+    "normalizedName": "paldean wonders",
+    "setCode": "b2a",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2026-02-26",
+    "cardCount": {
+      "official": 93,
+      "total": null
+    }
+  },
+  {
+    "id": "P-A",
+    "provider": "tcgdex",
+    "name": "Promos-A",
+    "normalizedName": "promos a",
+    "setCode": "pa",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2024-10-30",
+    "cardCount": {
+      "official": 0,
+      "total": null
+    }
+  },
+  {
+    "id": "A4a",
+    "provider": "tcgdex",
+    "name": "Secluded Springs",
+    "normalizedName": "secluded springs",
+    "setCode": "a4a",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-08-28",
+    "cardCount": {
+      "official": 71,
+      "total": null
+    }
+  },
+  {
+    "id": "A2b",
+    "provider": "tcgdex",
+    "name": "Shining Revelry",
+    "normalizedName": "shining revelry",
+    "setCode": "a2b",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-03-27",
+    "cardCount": {
+      "official": 72,
+      "total": null
+    }
+  },
+  {
+    "id": "A2",
+    "provider": "tcgdex",
+    "name": "Space-Time Smackdown",
+    "normalizedName": "space time smackdown",
+    "setCode": "a2",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-01-30",
+    "cardCount": {
+      "official": 140,
+      "total": null
+    }
+  },
+  {
+    "id": "A2a",
+    "provider": "tcgdex",
+    "name": "Triumphant Light",
+    "normalizedName": "triumphant light",
+    "setCode": "a2a",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-02-28",
+    "cardCount": {
+      "official": 75,
+      "total": null
+    }
+  },
+  {
+    "id": "A4",
+    "provider": "tcgdex",
+    "name": "Wisdom of Sea and Sky",
+    "normalizedName": "wisdom of sea and sky",
+    "setCode": "a4",
+    "series": "Pokémon TCG Pocket",
+    "language": "en",
+    "releaseDate": "2025-07-30",
+    "cardCount": {
+      "official": 161,
+      "total": null
+    }
+  },
+  {
+    "id": "np",
+    "provider": "tcgdex",
+    "name": "Nintendo Black Star Promos",
+    "normalizedName": "nintendo black star promos",
+    "setCode": "np",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2003-10-01",
+    "cardCount": {
+      "official": 40,
+      "total": null
+    }
+  },
+  {
+    "id": "pop1",
+    "provider": "tcgdex",
+    "name": "POP Series 1",
+    "normalizedName": "pop series 1",
+    "setCode": "pop1",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2004-09-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "pop2",
+    "provider": "tcgdex",
+    "name": "POP Series 2",
+    "normalizedName": "pop series 2",
+    "setCode": "pop2",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2005-08-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "pop3",
+    "provider": "tcgdex",
+    "name": "POP Series 3",
+    "normalizedName": "pop series 3",
+    "setCode": "pop3",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2006-04-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "pop4",
+    "provider": "tcgdex",
+    "name": "POP Series 4",
+    "normalizedName": "pop series 4",
+    "setCode": "pop4",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2006-08-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "pop5",
+    "provider": "tcgdex",
+    "name": "POP Series 5",
+    "normalizedName": "pop series 5",
+    "setCode": "pop5",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2007-03-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "pop6",
+    "provider": "tcgdex",
+    "name": "POP Series 6",
+    "normalizedName": "pop series 6",
+    "setCode": "pop6",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2007-09-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "pop7",
+    "provider": "tcgdex",
+    "name": "POP Series 7",
+    "normalizedName": "pop series 7",
+    "setCode": "pop7",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2008-03-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "pop8",
+    "provider": "tcgdex",
+    "name": "POP Series 8",
+    "normalizedName": "pop series 8",
+    "setCode": "pop8",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2008-09-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "pop9",
+    "provider": "tcgdex",
+    "name": "POP Series 9",
+    "normalizedName": "pop series 9",
+    "setCode": "pop9",
+    "series": "POP",
+    "language": "en",
+    "releaseDate": "2009-03-01",
+    "cardCount": {
+      "official": 17,
+      "total": null
+    }
+  },
+  {
+    "id": "sv03.5",
+    "provider": "tcgdex",
+    "name": "151",
+    "normalizedName": "151",
+    "setCode": "sv035",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2023-09-22",
+    "cardCount": {
+      "official": 165,
+      "total": null
+    }
+  },
+  {
+    "id": "sv10.5b",
+    "provider": "tcgdex",
+    "name": "Black Bolt",
+    "normalizedName": "black bolt",
+    "setCode": "sv105b",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2025-07-17",
+    "cardCount": {
+      "official": 86,
+      "total": null
+    }
+  },
+  {
+    "id": "sv10",
+    "provider": "tcgdex",
+    "name": "Destined Rivals",
+    "normalizedName": "destined rivals",
+    "setCode": "sv10",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2025-05-30",
+    "cardCount": {
+      "official": 182,
+      "total": null
+    }
+  },
+  {
+    "id": "sv09",
+    "provider": "tcgdex",
+    "name": "Journey Together",
+    "normalizedName": "journey together",
+    "setCode": "sv09",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2025-03-28",
+    "cardCount": {
+      "official": 159,
+      "total": null
+    }
+  },
+  {
+    "id": "mfb",
+    "provider": "tcgdex",
+    "name": "My First Battle",
+    "normalizedName": "my first battle",
+    "setCode": "mfb",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2023-09-29",
+    "cardCount": {
+      "official": 48,
+      "total": null
+    }
+  },
+  {
+    "id": "sv03",
+    "provider": "tcgdex",
+    "name": "Obsidian Flames",
+    "normalizedName": "obsidian flames",
+    "setCode": "sv03",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2023-08-11",
+    "cardCount": {
+      "official": 197,
+      "total": null
+    }
+  },
+  {
+    "id": "sv02",
+    "provider": "tcgdex",
+    "name": "Paldea Evolved",
+    "normalizedName": "paldea evolved",
+    "setCode": "sv02",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2023-06-09",
+    "cardCount": {
+      "official": 193,
+      "total": null
+    }
+  },
+  {
+    "id": "sv04.5",
+    "provider": "tcgdex",
+    "name": "Paldean Fates",
+    "normalizedName": "paldean fates",
+    "setCode": "sv045",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2024-01-26",
+    "cardCount": {
+      "official": 91,
+      "total": null
+    }
+  },
+  {
+    "id": "sv04",
+    "provider": "tcgdex",
+    "name": "Paradox Rift",
+    "normalizedName": "paradox rift",
+    "setCode": "sv04",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2023-11-03",
+    "cardCount": {
+      "official": 182,
+      "total": null
+    }
+  },
+  {
+    "id": "sv08.5",
+    "provider": "tcgdex",
+    "name": "Prismatic Evolutions",
+    "normalizedName": "prismatic evolutions",
+    "setCode": "sv085",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2025-01-17",
+    "cardCount": {
+      "official": 131,
+      "total": null
+    }
+  },
+  {
+    "id": "sve",
+    "provider": "tcgdex",
+    "name": "Scarlet & Violet Energy",
+    "normalizedName": "scarlet violet energy",
+    "setCode": "sve",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2023-03-31",
+    "cardCount": {
+      "official": 24,
+      "total": null
+    }
+  },
+  {
+    "id": "sv01",
+    "provider": "tcgdex",
+    "name": "Scarlet & Violet",
+    "normalizedName": "scarlet violet",
+    "setCode": "sv01",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2023-03-31",
+    "cardCount": {
+      "official": 198,
+      "total": null
+    }
+  },
+  {
+    "id": "sv06.5",
+    "provider": "tcgdex",
+    "name": "Shrouded Fable",
+    "normalizedName": "shrouded fable",
+    "setCode": "sv065",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2024-08-02",
+    "cardCount": {
+      "official": 64,
+      "total": null
+    }
+  },
+  {
+    "id": "sv07",
+    "provider": "tcgdex",
+    "name": "Stellar Crown",
+    "normalizedName": "stellar crown",
+    "setCode": "sv07",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2024-09-13",
+    "cardCount": {
+      "official": 142,
+      "total": null
+    }
+  },
+  {
+    "id": "sv08",
+    "provider": "tcgdex",
+    "name": "Surging Sparks",
+    "normalizedName": "surging sparks",
+    "setCode": "sv08",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2024-11-08",
+    "cardCount": {
+      "official": 191,
+      "total": null
+    }
+  },
+  {
+    "id": "svp",
+    "provider": "tcgdex",
+    "name": "SVP Black Star Promos",
+    "normalizedName": "svp black star promos",
+    "setCode": "svp",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2023-03-31",
+    "cardCount": {
+      "official": 225,
+      "total": null
+    }
+  },
+  {
+    "id": "sv05",
+    "provider": "tcgdex",
+    "name": "Temporal Forces",
+    "normalizedName": "temporal forces",
+    "setCode": "sv05",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2024-03-22",
+    "cardCount": {
+      "official": 162,
+      "total": null
+    }
+  },
+  {
+    "id": "sv06",
+    "provider": "tcgdex",
+    "name": "Twilight Masquerade",
+    "normalizedName": "twilight masquerade",
+    "setCode": "sv06",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2024-05-24",
+    "cardCount": {
+      "official": 167,
+      "total": null
+    }
+  },
+  {
+    "id": "sv10.5w",
+    "provider": "tcgdex",
+    "name": "White Flare",
+    "normalizedName": "white flare",
+    "setCode": "sv105w",
+    "series": "Scarlet & Violet",
+    "language": "en",
+    "releaseDate": "2025-07-17",
+    "cardCount": {
+      "official": 86,
+      "total": null
+    }
+  },
+  {
+    "id": "sm3",
+    "provider": "tcgdex",
+    "name": "Burning Shadows",
+    "normalizedName": "burning shadows",
+    "setCode": "sm3",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2017-08-04",
+    "cardCount": {
+      "official": 147,
+      "total": null
+    }
+  },
+  {
+    "id": "sm7",
+    "provider": "tcgdex",
+    "name": "Celestial Storm",
+    "normalizedName": "celestial storm",
+    "setCode": "sm7",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2018-08-03",
+    "cardCount": {
+      "official": 168,
+      "total": null
+    }
+  },
+  {
+    "id": "sm12",
+    "provider": "tcgdex",
+    "name": "Cosmic Eclipse",
+    "normalizedName": "cosmic eclipse",
+    "setCode": "sm12",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2019-11-01",
+    "cardCount": {
+      "official": 236,
+      "total": null
+    }
+  },
+  {
+    "id": "sm4",
+    "provider": "tcgdex",
+    "name": "Crimson Invasion",
+    "normalizedName": "crimson invasion",
+    "setCode": "sm4",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2017-11-03",
+    "cardCount": {
+      "official": 111,
+      "total": null
+    }
+  },
+  {
+    "id": "det1",
+    "provider": "tcgdex",
+    "name": "Detective Pikachu",
+    "normalizedName": "detective pikachu",
+    "setCode": "det1",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2019-03-29",
+    "cardCount": {
+      "official": 18,
+      "total": null
+    }
+  },
+  {
+    "id": "sm7.5",
+    "provider": "tcgdex",
+    "name": "Dragon Majesty",
+    "normalizedName": "dragon majesty",
+    "setCode": "sm75",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2018-09-07",
+    "cardCount": {
+      "official": 70,
+      "total": null
+    }
+  },
+  {
+    "id": "sm6",
+    "provider": "tcgdex",
+    "name": "Forbidden Light",
+    "normalizedName": "forbidden light",
+    "setCode": "sm6",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2018-05-04",
+    "cardCount": {
+      "official": 131,
+      "total": null
+    }
+  },
+  {
+    "id": "sm2",
+    "provider": "tcgdex",
+    "name": "Guardians Rising",
+    "normalizedName": "guardians rising",
+    "setCode": "sm2",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2017-05-05",
+    "cardCount": {
+      "official": 145,
+      "total": null
+    }
+  },
+  {
+    "id": "sma",
+    "provider": "tcgdex",
+    "name": "Hidden Fates Shiny Vault",
+    "normalizedName": "hidden fates shiny vault",
+    "setCode": "sma",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2019-08-23",
+    "cardCount": {
+      "official": 94,
+      "total": null
+    }
+  },
+  {
+    "id": "sm115",
+    "provider": "tcgdex",
+    "name": "Hidden Fates",
+    "normalizedName": "hidden fates",
+    "setCode": "sm115",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2019-08-23",
+    "cardCount": {
+      "official": 68,
+      "total": null
+    }
+  },
+  {
+    "id": "sm8",
+    "provider": "tcgdex",
+    "name": "Lost Thunder",
+    "normalizedName": "lost thunder",
+    "setCode": "sm8",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2018-11-02",
+    "cardCount": {
+      "official": 214,
+      "total": null
+    }
+  },
+  {
+    "id": "sm3.5",
+    "provider": "tcgdex",
+    "name": "Shining Legends",
+    "normalizedName": "shining legends",
+    "setCode": "sm35",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2017-10-06",
+    "cardCount": {
+      "official": 73,
+      "total": null
+    }
+  },
+  {
+    "id": "smp",
+    "provider": "tcgdex",
+    "name": "SM Black Star Promos",
+    "normalizedName": "sm black star promos",
+    "setCode": "smp",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2017-02-03",
+    "cardCount": {
+      "official": 248,
+      "total": null
+    }
+  },
+  {
+    "id": "sm1",
+    "provider": "tcgdex",
+    "name": "Sun & Moon",
+    "normalizedName": "sun moon",
+    "setCode": "sm1",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2017-02-03",
+    "cardCount": {
+      "official": 149,
+      "total": null
+    }
+  },
+  {
+    "id": "sm9",
+    "provider": "tcgdex",
+    "name": "Team Up",
+    "normalizedName": "team up",
+    "setCode": "sm9",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2019-01-31",
+    "cardCount": {
+      "official": 181,
+      "total": null
+    }
+  },
+  {
+    "id": "sm5",
+    "provider": "tcgdex",
+    "name": "Ultra Prism",
+    "normalizedName": "ultra prism",
+    "setCode": "sm5",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2018-02-02",
+    "cardCount": {
+      "official": 156,
+      "total": null
+    }
+  },
+  {
+    "id": "sm10",
+    "provider": "tcgdex",
+    "name": "Unbroken Bonds",
+    "normalizedName": "unbroken bonds",
+    "setCode": "sm10",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2019-05-03",
+    "cardCount": {
+      "official": 214,
+      "total": null
+    }
+  },
+  {
+    "id": "sm11",
+    "provider": "tcgdex",
+    "name": "Unified Minds",
+    "normalizedName": "unified minds",
+    "setCode": "sm11",
+    "series": "Sun & Moon",
+    "language": "en",
+    "releaseDate": "2019-08-02",
+    "cardCount": {
+      "official": 236,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh10",
+    "provider": "tcgdex",
+    "name": "Astral Radiance",
+    "normalizedName": "astral radiance",
+    "setCode": "swsh10",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2022-05-27",
+    "cardCount": {
+      "official": 189,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh5",
+    "provider": "tcgdex",
+    "name": "Battle Styles",
+    "normalizedName": "battle styles",
+    "setCode": "swsh5",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2021-03-19",
+    "cardCount": {
+      "official": 163,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh9.5tg",
+    "provider": "tcgdex",
+    "name": "Brilliant Stars Trainer Gallery",
+    "normalizedName": "brilliant stars trainer gallery",
+    "setCode": "swsh95tg",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2022-02-25",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh9",
+    "provider": "tcgdex",
+    "name": "Brilliant Stars",
+    "normalizedName": "brilliant stars",
+    "setCode": "swsh9",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2022-02-25",
+    "cardCount": {
+      "official": 172,
+      "total": null
+    }
+  },
+  {
+    "id": "cel25",
+    "provider": "tcgdex",
+    "name": "Celebrations",
+    "normalizedName": "celebrations",
+    "setCode": "cel25",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2021-10-08",
+    "cardCount": {
+      "official": 25,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh3.5",
+    "provider": "tcgdex",
+    "name": "Champion",
+    "normalizedName": "champion",
+    "setCode": "swsh35",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2020-09-25",
+    "cardCount": {
+      "official": 73,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh6",
+    "provider": "tcgdex",
+    "name": "Chilling Reign",
+    "normalizedName": "chilling reign",
+    "setCode": "swsh6",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2021-06-18",
+    "cardCount": {
+      "official": 198,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh12.5gg",
+    "provider": "tcgdex",
+    "name": "Crown Zenith Galarian Gallery",
+    "normalizedName": "crown zenith galarian gallery",
+    "setCode": "swsh125gg",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2023-01-20",
+    "cardCount": {
+      "official": 70,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh12.5",
+    "provider": "tcgdex",
+    "name": "Crown Zenith",
+    "normalizedName": "crown zenith",
+    "setCode": "swsh125",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2023-01-20",
+    "cardCount": {
+      "official": 159,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh3",
+    "provider": "tcgdex",
+    "name": "Darkness Ablaze",
+    "normalizedName": "darkness ablaze",
+    "setCode": "swsh3",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2020-08-14",
+    "cardCount": {
+      "official": 189,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh7",
+    "provider": "tcgdex",
+    "name": "Evolving Skies",
+    "normalizedName": "evolving skies",
+    "setCode": "swsh7",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2021-08-27",
+    "cardCount": {
+      "official": 203,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh8",
+    "provider": "tcgdex",
+    "name": "Fusion Strike",
+    "normalizedName": "fusion strike",
+    "setCode": "swsh8",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2021-11-12",
+    "cardCount": {
+      "official": 264,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh11.5tg",
+    "provider": "tcgdex",
+    "name": "Lost Origin Trainer Gallery",
+    "normalizedName": "lost origin trainer gallery",
+    "setCode": "swsh115tg",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2022-09-09",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh11",
+    "provider": "tcgdex",
+    "name": "Lost Origin",
+    "normalizedName": "lost origin",
+    "setCode": "swsh11",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2022-09-09",
+    "cardCount": {
+      "official": 196,
+      "total": null
+    }
+  },
+  {
+    "id": "fut2020",
+    "provider": "tcgdex",
+    "name": "Pokémon Futsal 2020",
+    "normalizedName": "pokemon futsal 2020",
+    "setCode": "fut2020",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2020-09-11",
+    "cardCount": {
+      "official": 5,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh10.5",
+    "provider": "tcgdex",
+    "name": "Pokémon GO",
+    "normalizedName": "pokemon go",
+    "setCode": "swsh105",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2022-07-01",
+    "cardCount": {
+      "official": 78,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh2",
+    "provider": "tcgdex",
+    "name": "Rebel Clash",
+    "normalizedName": "rebel clash",
+    "setCode": "swsh2",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2020-05-01",
+    "cardCount": {
+      "official": 192,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh4.5sv",
+    "provider": "tcgdex",
+    "name": "Shining Fates Shiny Vault",
+    "normalizedName": "shining fates shiny vault",
+    "setCode": "swsh45sv",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2021-02-19",
+    "cardCount": {
+      "official": 122,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh4.5",
+    "provider": "tcgdex",
+    "name": "Shining Fates",
+    "normalizedName": "shining fates",
+    "setCode": "swsh45",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2021-02-19",
+    "cardCount": {
+      "official": 72,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh12.5tg",
+    "provider": "tcgdex",
+    "name": "Silver Tempest Trainer Gallery",
+    "normalizedName": "silver tempest trainer gallery",
+    "setCode": "swsh125tg",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2022-11-11",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh12",
+    "provider": "tcgdex",
+    "name": "Silver Tempest",
+    "normalizedName": "silver tempest",
+    "setCode": "swsh12",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2022-11-11",
+    "cardCount": {
+      "official": 195,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh1",
+    "provider": "tcgdex",
+    "name": "Sword & Shield",
+    "normalizedName": "sword shield",
+    "setCode": "swsh1",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2020-02-07",
+    "cardCount": {
+      "official": 202,
+      "total": null
+    }
+  },
+  {
+    "id": "swshp",
+    "provider": "tcgdex",
+    "name": "SWSH Black Star Promos",
+    "normalizedName": "swsh black star promos",
+    "setCode": "swshp",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2019-11-15",
+    "cardCount": {
+      "official": 307,
+      "total": null
+    }
+  },
+  {
+    "id": "swsh4",
+    "provider": "tcgdex",
+    "name": "Vivid Voltage",
+    "normalizedName": "vivid voltage",
+    "setCode": "swsh4",
+    "series": "Sword & Shield",
+    "language": "en",
+    "releaseDate": "2020-11-13",
+    "cardCount": {
+      "official": 185,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-bw-e",
+    "provider": "tcgdex",
+    "name": "BW trainer Kit (Excadrill)",
+    "normalizedName": "bw trainer kit excadrill",
+    "setCode": "tkbwe",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2011-09-01",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-bw-z",
+    "provider": "tcgdex",
+    "name": "BW trainer Kit (Zoroark)",
+    "normalizedName": "bw trainer kit zoroark",
+    "setCode": "tkbwz",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2011-09-01",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-dp-l",
+    "provider": "tcgdex",
+    "name": "DP trainer Kit (Lucario)",
+    "normalizedName": "dp trainer kit lucario",
+    "setCode": "tkdpl",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2007-09-01",
+    "cardCount": {
+      "official": 11,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-dp-m",
+    "provider": "tcgdex",
+    "name": "DP trainer Kit (Manaphy)",
+    "normalizedName": "dp trainer kit manaphy",
+    "setCode": "tkdpm",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2007-09-01",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-ex-latia",
+    "provider": "tcgdex",
+    "name": "EX trainer Kit (Latias)",
+    "normalizedName": "ex trainer kit latias",
+    "setCode": "tkexlatia",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2004-07-01",
+    "cardCount": {
+      "official": 10,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-ex-latio",
+    "provider": "tcgdex",
+    "name": "EX trainer Kit (Latios)",
+    "normalizedName": "ex trainer kit latios",
+    "setCode": "tkexlatio",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2004-07-01",
+    "cardCount": {
+      "official": 10,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-ex-m",
+    "provider": "tcgdex",
+    "name": "EX trainer Kit 2 (Minun)",
+    "normalizedName": "ex trainer kit 2 minun",
+    "setCode": "tkexm",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2006-03-01",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-ex-p",
+    "provider": "tcgdex",
+    "name": "EX trainer Kit 2 (Plusle)",
+    "normalizedName": "ex trainer kit 2 plusle",
+    "setCode": "tkexp",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2006-03-01",
+    "cardCount": {
+      "official": 12,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-hs-g",
+    "provider": "tcgdex",
+    "name": "HS trainer Kit (Gyarados)",
+    "normalizedName": "hs trainer kit gyarados",
+    "setCode": "tkhsg",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2010-05-01",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-hs-r",
+    "provider": "tcgdex",
+    "name": "HS trainer Kit (Raichu)",
+    "normalizedName": "hs trainer kit raichu",
+    "setCode": "tkhsr",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2010-05-01",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-sm-r",
+    "provider": "tcgdex",
+    "name": "SM trainer Kit (Alolan Raichu)",
+    "normalizedName": "sm trainer kit alolan raichu",
+    "setCode": "tksmr",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2017-04-21",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-sm-l",
+    "provider": "tcgdex",
+    "name": "SM trainer Kit (Lycanroc)",
+    "normalizedName": "sm trainer kit lycanroc",
+    "setCode": "tksml",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2017-04-21",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-xy-b",
+    "provider": "tcgdex",
+    "name": "XY trainer Kit (Bisharp)",
+    "normalizedName": "xy trainer kit bisharp",
+    "setCode": "tkxyb",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2014-11-01",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-xy-latia",
+    "provider": "tcgdex",
+    "name": "XY trainer Kit (Latias)",
+    "normalizedName": "xy trainer kit latias",
+    "setCode": "tkxylatia",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2015-04-29",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-xy-latio",
+    "provider": "tcgdex",
+    "name": "XY trainer Kit (Latios)",
+    "normalizedName": "xy trainer kit latios",
+    "setCode": "tkxylatio",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2015-04-29",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-xy-n",
+    "provider": "tcgdex",
+    "name": "XY trainer Kit (Noivern)",
+    "normalizedName": "xy trainer kit noivern",
+    "setCode": "tkxyn",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2014-03-12",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-xy-p",
+    "provider": "tcgdex",
+    "name": "XY trainer Kit (Pikachu Libre)",
+    "normalizedName": "xy trainer kit pikachu libre",
+    "setCode": "tkxyp",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2016-04-27",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-xy-su",
+    "provider": "tcgdex",
+    "name": "XY trainer Kit (Suicune)",
+    "normalizedName": "xy trainer kit suicune",
+    "setCode": "tkxysu",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2016-04-27",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-xy-sy",
+    "provider": "tcgdex",
+    "name": "XY trainer Kit (Sylveon)",
+    "normalizedName": "xy trainer kit sylveon",
+    "setCode": "tkxysy",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2014-03-12",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "tk-xy-w",
+    "provider": "tcgdex",
+    "name": "XY trainer Kit (Wigglytuff)",
+    "normalizedName": "xy trainer kit wigglytuff",
+    "setCode": "tkxyw",
+    "series": "Trainer kits",
+    "language": "en",
+    "releaseDate": "2014-11-01",
+    "cardCount": {
+      "official": 30,
+      "total": null
+    }
+  },
+  {
+    "id": "xy7",
+    "provider": "tcgdex",
+    "name": "Ancient Origins",
+    "normalizedName": "ancient origins",
+    "setCode": "xy7",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2015-08-12",
+    "cardCount": {
+      "official": 98,
+      "total": null
+    }
+  },
+  {
+    "id": "xy9",
+    "provider": "tcgdex",
+    "name": "BREAKpoint",
+    "normalizedName": "breakpoint",
+    "setCode": "xy9",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2016-02-03",
+    "cardCount": {
+      "official": 122,
+      "total": null
+    }
+  },
+  {
+    "id": "xy8",
+    "provider": "tcgdex",
+    "name": "BREAKthrough",
+    "normalizedName": "breakthrough",
+    "setCode": "xy8",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2015-11-04",
+    "cardCount": {
+      "official": 162,
+      "total": null
+    }
+  },
+  {
+    "id": "dc1",
+    "provider": "tcgdex",
+    "name": "Double Crisis",
+    "normalizedName": "double crisis",
+    "setCode": "dc1",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2015-03-25",
+    "cardCount": {
+      "official": 34,
+      "total": null
+    }
+  },
+  {
+    "id": "xy12",
+    "provider": "tcgdex",
+    "name": "Evolutions",
+    "normalizedName": "evolutions",
+    "setCode": "xy12",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2016-11-02",
+    "cardCount": {
+      "official": 108,
+      "total": null
+    }
+  },
+  {
+    "id": "xy10",
+    "provider": "tcgdex",
+    "name": "Fates Collide",
+    "normalizedName": "fates collide",
+    "setCode": "xy10",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2016-05-02",
+    "cardCount": {
+      "official": 124,
+      "total": null
+    }
+  },
+  {
+    "id": "xy2",
+    "provider": "tcgdex",
+    "name": "Flashfire",
+    "normalizedName": "flashfire",
+    "setCode": "xy2",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2014-05-07",
+    "cardCount": {
+      "official": 106,
+      "total": null
+    }
+  },
+  {
+    "id": "xy3",
+    "provider": "tcgdex",
+    "name": "Furious Fists",
+    "normalizedName": "furious fists",
+    "setCode": "xy3",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2014-08-13",
+    "cardCount": {
+      "official": 111,
+      "total": null
+    }
+  },
+  {
+    "id": "g1",
+    "provider": "tcgdex",
+    "name": "Generations",
+    "normalizedName": "generations",
+    "setCode": "g1",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2016-02-22",
+    "cardCount": {
+      "official": 83,
+      "total": null
+    }
+  },
+  {
+    "id": "xy0",
+    "provider": "tcgdex",
+    "name": "Kalos Starter Set",
+    "normalizedName": "kalos starter set",
+    "setCode": "xy0",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2013-11-08",
+    "cardCount": {
+      "official": 39,
+      "total": null
+    }
+  },
+  {
+    "id": "xy4",
+    "provider": "tcgdex",
+    "name": "Phantom Forces",
+    "normalizedName": "phantom forces",
+    "setCode": "xy4",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2014-11-05",
+    "cardCount": {
+      "official": 119,
+      "total": null
+    }
+  },
+  {
+    "id": "xy5",
+    "provider": "tcgdex",
+    "name": "Primal Clash",
+    "normalizedName": "primal clash",
+    "setCode": "xy5",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2015-02-04",
+    "cardCount": {
+      "official": 160,
+      "total": null
+    }
+  },
+  {
+    "id": "xy6",
+    "provider": "tcgdex",
+    "name": "Roaring Skies",
+    "normalizedName": "roaring skies",
+    "setCode": "xy6",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2015-05-06",
+    "cardCount": {
+      "official": 108,
+      "total": null
+    }
+  },
+  {
+    "id": "xy11",
+    "provider": "tcgdex",
+    "name": "Steam Siege",
+    "normalizedName": "steam siege",
+    "setCode": "xy11",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2016-08-03",
+    "cardCount": {
+      "official": 114,
+      "total": null
+    }
+  },
+  {
+    "id": "xyp",
+    "provider": "tcgdex",
+    "name": "XY Black Star Promos",
+    "normalizedName": "xy black star promos",
+    "setCode": "xyp",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2013-10-12",
+    "cardCount": {
+      "official": 211,
+      "total": null
+    }
+  },
+  {
+    "id": "xy1",
+    "provider": "tcgdex",
+    "name": "XY",
+    "normalizedName": "xy",
+    "setCode": "xy1",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2014-02-05",
+    "cardCount": {
+      "official": 146,
+      "total": null
+    }
+  },
+  {
+    "id": "xya",
+    "provider": "tcgdex",
+    "name": "Yellow A Alternate",
+    "normalizedName": "yellow a alternate",
+    "setCode": "xya",
+    "series": "XY",
+    "language": "en",
+    "releaseDate": "2014-02-05",
+    "cardCount": {
+      "official": 6,
+      "total": null
+    }
+  }
+]

@@ -5,7 +5,7 @@ import { FileUpload } from './components/FileUpload.jsx';
 import { HitLogo } from './components/HitLogo.jsx';
 import { ManualCropper } from './components/ManualCropper.jsx';
 import { Results } from './components/Results.jsx';
-import { confirmDetectedCard, detectCardScan, fetchRecentScans } from './services/cardDetectionApi.js';
+import { confirmDetectedCard, correctDetectedCard, detectCardScan, fetchRecentScans } from './services/cardDetectionApi.js';
 
 const supportedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif'];
 
@@ -155,6 +155,7 @@ export default function App() {
       setResult(updated);
       setHistory((current) => [updated, ...current.filter((item) => item.scanId !== updated.scanId)].slice(0, 8));
       setShowAlternatives(false);
+      setStatus('complete');
     } catch (confirmError) {
       setError(confirmError.message || 'Could not confirm the detected card.');
     }
@@ -165,9 +166,28 @@ export default function App() {
     setResult({
       ...result,
       closestMatch: candidate,
-      alternatives: [result.closestMatch, ...result.alternatives.filter((entry) => entry.id !== candidate.id)].filter(Boolean),
+      alternatives: [result.closestMatch, ...(result.alternatives || []).filter((entry) => entry.id !== candidate.id)].filter(Boolean),
       needsUserConfirmation: true
     });
+  };
+
+  const handleCorrectionSearch = async (fields) => {
+    if (!result) return;
+    setError('');
+    setStatus('scanning');
+    try {
+      const updated = await correctDetectedCard({
+        scanId: result.scanId,
+        ...fields
+      });
+      setResult(updated);
+      setHistory((current) => [updated, ...current.filter((item) => item.scanId !== updated.scanId)].slice(0, 8));
+      setShowAlternatives(false);
+      setStatus(updated.status === 'success' || updated.status === 'success_with_fallback' ? 'complete' : 'review');
+    } catch (correctionError) {
+      setStatus('review');
+      setError(correctionError.message || 'Could not re-run the card search.');
+    }
   };
 
   const handleManualCropDetect = async (manualCrop) => {
@@ -287,6 +307,8 @@ export default function App() {
           onPickAlternative={handleAlternativePick}
           showAlternatives={showAlternatives}
           onStartManualCrop={() => setShowManualCrop(true)}
+          onCorrectResult={handleCorrectionSearch}
+          correcting={status === 'scanning'}
         />
       )}
 

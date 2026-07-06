@@ -1,8 +1,13 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
+import https from 'node:https';
+import { env } from '../config/env.js';
 import { globalCache } from './cache.js';
 import { sleep } from './async.js';
 
 const RETRY_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+const insecureDevAgent = env.ALLOW_INSECURE_DEV_TLS && process.env.NODE_ENV !== 'production'
+  ? new https.Agent({ rejectUnauthorized: false })
+  : undefined;
 
 export async function requestJson<T>(
   url: string,
@@ -34,6 +39,7 @@ export async function requestJsonWithMeta<T>(
       const response = await axios.request<T>({
         timeout: config.timeout ?? 8000,
         responseType: 'json',
+        ...(insecureDevAgent ? { httpsAgent: insecureDevAgent } : {}),
         ...config,
         url
       });
@@ -49,6 +55,11 @@ export async function requestJsonWithMeta<T>(
       const status = axios.isAxiosError(error) ? error.response?.status : undefined;
       if (attempt === retries || (status !== undefined && !RETRY_STATUS.has(status))) {
         if (error instanceof AxiosError) {
+          if (/certificate|unable to verify|self-signed|UNABLE_TO_VERIFY/i.test(error.message)) {
+            throw new Error(
+              'HTTPS certificate verification failed. Run Node with --use-system-ca, set NODE_EXTRA_CA_CERTS to your local CA bundle, or enable ALLOW_INSECURE_DEV_TLS=true only for local development.'
+            );
+          }
           throw new Error(status === 429 ? 'Card data provider rate limit hit. Please try again shortly.' : error.message);
         }
         throw error;
