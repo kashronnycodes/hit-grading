@@ -5,7 +5,14 @@ import { FileUpload } from './components/FileUpload.jsx';
 import { HitLogo } from './components/HitLogo.jsx';
 import { ManualCropper } from './components/ManualCropper.jsx';
 import { Results } from './components/Results.jsx';
-import { confirmDetectedCard, correctDetectedCard, detectCardScan, fetchRecentScans } from './services/cardDetectionApi.js';
+import {
+  checkApiHealth,
+  confirmDetectedCard,
+  correctDetectedCard,
+  detectCardScan,
+  fetchRecentScans,
+  getApiDiagnostics
+} from './services/cardDetectionApi.js';
 
 const supportedTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif'];
 
@@ -60,9 +67,36 @@ export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [showAlternatives, setShowAlternatives] = useState(false);
   const [showManualCrop, setShowManualCrop] = useState(false);
+  const [networkDiagnostic, setNetworkDiagnostic] = useState(null);
   const [isPending, startTransition] = useTransition();
 
   const canAnalyze = useMemo(() => Boolean(files.front), [files.front]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+
+    let active = true;
+    const details = getApiDiagnostics();
+    checkApiHealth()
+      .then(() => {
+        const diagnostic = { ...details, apiHealth: 'ok' };
+        console.info('[hit-grading:network]', diagnostic);
+        if (active) setNetworkDiagnostic(diagnostic);
+      })
+      .catch((healthError) => {
+        const diagnostic = {
+          ...details,
+          apiHealth: 'failed',
+          error: healthError instanceof Error ? healthError.message : 'Unknown API health error.'
+        };
+        console.warn('[hit-grading:network]', diagnostic);
+        if (active) setNetworkDiagnostic(diagnostic);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -223,6 +257,15 @@ export default function App() {
         <p><Sparkles size={17} /> Powered by Advanced AI Technology</p>
         <div className="domain-line"><span aria-hidden="true" /> Part of hitgrading.com</div>
       </header>
+
+      {import.meta.env.DEV && networkDiagnostic ? (
+        <div className={`network-diagnostic ${networkDiagnostic.apiHealth === 'ok' ? 'ok' : 'failed'}`}>
+          <strong>Dev network:</strong>
+          <span>{networkDiagnostic.frontendOrigin}</span>
+          <span>API {networkDiagnostic.apiBaseUrl}</span>
+          <span>{networkDiagnostic.apiHealth === 'ok' ? 'API connected' : `API failed: ${networkDiagnostic.error}`}</span>
+        </div>
+      ) : null}
 
       {!result ? (
         <section className="upload-card" aria-busy={status === 'scanning'}>

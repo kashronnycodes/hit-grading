@@ -2,12 +2,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "dev:mobile": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs scripts/devMobile.ts",
+    "dev:mobile:no-hmr": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs scripts/devMobile.ts --no-hmr",
     "dev:api": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs watch server/src/index.ts",
     "build": "vite build && tsc -p tsconfig.server.json",
     "build:api": "tsc -p tsconfig.server.json",
     "sync:pokemon": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs scripts/syncPokemonMetadata.ts",
     "pokemon:sync:diagnose": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs scripts/diagnosePokemonSync.ts",
     "pokemon:cache:stats": "node ./node_modules/tsx/dist/cli.mjs scripts/pokemonCacheStats.ts",
+    "network:doctor": "node ./node_modules/tsx/dist/cli.mjs scripts/networkDoctor.ts",
     "preview": "vite preview --host 0.0.0.0",
     "start:api": "node dist-server/index.js"
   },

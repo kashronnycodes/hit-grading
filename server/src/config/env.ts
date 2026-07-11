@@ -4,6 +4,7 @@ import { z } from 'zod';
 config();
 
 const envSchema = z.object({
+  NODE_ENV: z.string().default('development'),
   HOST: z.string().default('0.0.0.0'),
   PORT: z.coerce.number().default(8787),
   CLIENT_ORIGIN: z.string().default('http://127.0.0.1:5173'),

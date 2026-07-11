@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HIT Grading Mobile Connectivity Test</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Arial, sans-serif;
+        background: #05070d;
+        color: #f5f7fb;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      main {
+        width: min(100%, 560px);
+        border: 1px solid rgba(79, 209, 255, 0.28);
+        border-radius: 14px;
+        background: #0c1322;
+        padding: 20px;
+        box-shadow: 0 0 30px rgba(45, 133, 255, 0.18);
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        font-size: 24px;
+      }
+
+      dl {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+      }
+
+      dt {
+        color: #aab7c9;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      dd {
+        margin: 2px 0 0;
+        overflow-wrap: anywhere;
+      }
+
+      .ok {
+        color: #67e8f9;
+      }
+
+      .failed {
+        color: #fca5a5;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Mobile connectivity test page loaded.</h1>
+      <dl>
+        <div>
+          <dt>Origin</dt>
+          <dd id="origin"></dd>
+        </div>
+        <div>
+          <dt>Timestamp</dt>
+          <dd id="timestamp"></dd>
+        </div>
+        <div>
+          <dt>API health</dt>
+          <dd id="api-health">Checking /api/health...</dd>
+        </div>
+        <div>
+          <dt>Network info</dt>
+          <dd id="network-info">Checking /api/network-info...</dd>
+        </div>
+      </dl>
+    </main>
+    <script>
+      const origin = window.location.origin;
+      document.getElementById('origin').textContent = origin;
+      document.getElementById('timestamp').textContent = new Date().toISOString();
+
+      async function check(path, id) {
+        const target = document.getElementById(id);
+        try {
+          const response = await fetch(path, { cache: 'no-store' });
+          const text = await response.text();
+          target.className = response.ok ? 'ok' : 'failed';
+          target.textContent = `${response.status} ${response.statusText}: ${text.slice(0, 300)}`;
+        } catch (error) {
+          target.className = 'failed';
+          target.textContent = error instanceof Error ? error.message : 'Request failed.';
+        }
+      }
+
+      check('/api/health', 'api-health');
+      check('/api/network-info', 'network-info');
+    </script>
+  </body>
+</html>

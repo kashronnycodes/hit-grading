@@ -35,8 +35,14 @@ export function CameraCapture({ label, onCapture, onClose }) {
           await videoRef.current.play();
           setReady(true);
         }
-      } catch {
-        setError('Camera permission was blocked or unavailable. Use gallery upload instead.');
+      } catch (cameraError) {
+        const isInsecureContext = typeof window !== 'undefined' && !window.isSecureContext;
+        const browserMessage = cameraError instanceof Error ? cameraError.message : '';
+        setError(
+          isInsecureContext
+            ? 'Camera capture may require HTTPS on this phone browser. Use gallery upload, localhost, or an HTTPS tunnel for camera testing.'
+            : `Camera permission was blocked or unavailable. Use gallery upload instead.${browserMessage ? ` (${browserMessage})` : ''}`
+        );
       }
     }
 

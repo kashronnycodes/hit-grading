@@ -130,6 +130,33 @@ input {
   box-shadow: 0 0 10px rgba(0, 231, 255, 0.8);
 }
 
+.network-diagnostic {
+  width: min(92vw, 620px);
+  margin: -10px auto 18px;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
+  background: rgba(8, 13, 26, 0.86);
+  color: #aeb8ca;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.network-diagnostic strong {
+  color: #f8fbff;
+}
+
+.network-diagnostic.ok {
+  border-color: rgba(34, 211, 238, 0.35);
+}
+
+.network-diagnostic.failed {
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #fecaca;
+}
+
 .upload-card,
 .results-card,
 .history-section,
