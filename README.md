@@ -175,6 +175,7 @@ Frontend environment variables:
 VITE_API_BASE_URL=
 VITE_USE_MOCK_SCAN=false
 VITE_MOCK_SCAN_STATE=identified
+VITE_SHOW_DEPLOY_DIAGNOSTICS=false
 ```
 
 Use `VITE_API_BASE_URL` only after the backend is deployed separately, for example:
@@ -208,6 +209,14 @@ https://your-vercel-preview.vercel.app/?mockState=needs_better_photo
 
 Mock mode is frontend-only and clearly labels results as mock/dev only. It does not call OCR, card databases, pricing providers, Scrydex, or the backend.
 
+For frontend-only Vercel testing before the backend is deployed, use:
+
+```text
+VITE_USE_MOCK_SCAN=true
+VITE_SHOW_DEPLOY_DIAGNOSTICS=true
+VITE_API_BASE_URL=
+```
+
 Deployment steps:
 
 1. Push the repo to GitHub.
@@ -218,3 +227,33 @@ Deployment steps:
 6. Leave `VITE_API_BASE_URL` blank until the backend is deployed.
 7. Set `VITE_USE_MOCK_SCAN=true` for phone UI testing without a backend.
 8. Open the Vercel preview URL on your phone.
+
+### Vercel Blank Page Troubleshooting
+
+If the Vercel URL shows only the dark background:
+
+1. Check the Vercel build logs and confirm `npm run build` passed.
+2. Open the browser console on desktop and look for a React/runtime error.
+3. Set this Vercel environment variable and redeploy:
+
+```text
+VITE_SHOW_DEPLOY_DIAGNOSTICS=true
+```
+
+4. For frontend-only testing without a backend, set these and redeploy:
+
+```text
+VITE_USE_MOCK_SCAN=true
+VITE_SHOW_DEPLOY_DIAGNOSTICS=true
+VITE_API_BASE_URL=
+```
+
+5. Only set `VITE_API_BASE_URL` after the backend is deployed separately:
+
+```text
+VITE_API_BASE_URL=https://your-backend-service.example.com
+```
+
+6. Redeploy after every Vercel environment variable change.
+
+The app has a top-level error boundary. If React crashes, it should show a visible error panel instead of only the background. Deployment diagnostics show current origin, API base URL, mock mode, build mode, and API health status.

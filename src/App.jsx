@@ -57,6 +57,7 @@ async function compressForUpload(file) {
 }
 
 export default function App() {
+  const showDeployDiagnostics = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEPLOY_DIAGNOSTICS === 'true';
   const [files, setFiles] = useState({ front: null, back: null });
   const [previews, setPreviews] = useState({ front: '', back: '' });
   const [status, setStatus] = useState('idle');
@@ -67,13 +68,17 @@ export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [showAlternatives, setShowAlternatives] = useState(false);
   const [showManualCrop, setShowManualCrop] = useState(false);
-  const [networkDiagnostic, setNetworkDiagnostic] = useState(null);
+  const [networkDiagnostic, setNetworkDiagnostic] = useState(() => getApiDiagnostics());
   const [isPending, startTransition] = useTransition();
 
   const canAnalyze = useMemo(() => Boolean(files.front), [files.front]);
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    const shouldCheckHealth =
+      showDeployDiagnostics ||
+      Boolean(import.meta.env.VITE_API_BASE_URL) ||
+      networkDiagnostic.mockScan;
+    if (!shouldCheckHealth) return;
 
     let active = true;
     const details = getApiDiagnostics();
@@ -96,7 +101,7 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [showDeployDiagnostics, networkDiagnostic.mockScan]);
 
   useEffect(() => {
     let active = true;
@@ -258,12 +263,28 @@ export default function App() {
         <div className="domain-line"><span aria-hidden="true" /> Part of hitgrading.com</div>
       </header>
 
-      {import.meta.env.DEV && networkDiagnostic ? (
+      {showDeployDiagnostics && networkDiagnostic ? (
         <div className={`network-diagnostic ${networkDiagnostic.apiHealth === 'ok' ? 'ok' : 'failed'}`}>
-          <strong>Dev network:</strong>
+          <strong>{import.meta.env.DEV ? 'Dev network:' : 'Deploy diagnostics:'}</strong>
           <span>{networkDiagnostic.frontendOrigin}</span>
           <span>API {networkDiagnostic.apiBaseUrl}</span>
-          <span>{networkDiagnostic.apiHealth === 'ok' ? 'API connected' : `API failed: ${networkDiagnostic.error}`}</span>
+          <span>Mode {networkDiagnostic.mode}</span>
+          <span>Mock scan {networkDiagnostic.mockScan ? 'on' : 'off'}</span>
+          <span>{networkDiagnostic.apiHealth === 'ok' ? 'API connected' : `API ${networkDiagnostic.apiHealth || 'not checked'}${networkDiagnostic.error ? `: ${networkDiagnostic.error}` : ''}`}</span>
+        </div>
+      ) : null}
+
+      {!import.meta.env.DEV && !networkDiagnostic.backendConfigured && !networkDiagnostic.mockScan ? (
+        <div className="deployment-warning">
+          <strong>Backend API is not connected yet.</strong>
+          <span>You can still test the frontend UI. Enable mock mode or set VITE_API_BASE_URL to your deployed backend URL.</span>
+        </div>
+      ) : null}
+
+      {networkDiagnostic.mockScan ? (
+        <div className="deployment-warning mock">
+          <strong>Mock/dev only mode is enabled.</strong>
+          <span>Scans return sample frontend results. OCR, card databases, pricing providers, and the backend are not called.</span>
         </div>
       ) : null}
 

@@ -1,6 +1,8 @@
 import { History } from 'lucide-react';
 
 export function AnalysisHistory({ items, loading }) {
+  const safeItems = Array.isArray(items) ? items : [];
+
   return (
     <section className="history-section">
       <div className="history-heading">
@@ -8,11 +10,11 @@ export function AnalysisHistory({ items, loading }) {
         <h2>Card Analysis History</h2>
       </div>
 
-      {items.length === 0 ? (
+      {safeItems.length === 0 ? (
         <div className="history-empty">{loading ? 'Loading saved scans...' : 'Detected cards will appear here after scanning.'}</div>
       ) : (
         <div className="history-list">
-          {items.map((item) => (
+          {safeItems.map((item) => (
             <article className="history-item" key={item.scanId || item.id}>
               <div className="history-thumbs">
                 {item.normalizedImageUrl || item.previews?.front ? <img src={item.normalizedImageUrl || item.previews.front} alt="Analyzed card front" /> : <div>Front</div>}

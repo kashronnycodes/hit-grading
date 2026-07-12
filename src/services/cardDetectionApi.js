@@ -1,5 +1,6 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 const USE_MOCK_SCAN = import.meta.env.VITE_USE_MOCK_SCAN === 'true';
+const SHOW_DEPLOY_DIAGNOSTICS = import.meta.env.VITE_SHOW_DEPLOY_DIAGNOSTICS === 'true';
 
 const MOCK_CANDIDATES = [
   {
@@ -153,12 +154,29 @@ export function getApiDiagnostics() {
     frontendOrigin: origin,
     apiBaseUrl: API_BASE_URL || origin || 'same-origin',
     mode: import.meta.env.MODE,
-    mockScan: USE_MOCK_SCAN
+    mockScan: USE_MOCK_SCAN,
+    deployDiagnostics: SHOW_DEPLOY_DIAGNOSTICS,
+    backendConfigured: Boolean(API_BASE_URL) || import.meta.env.DEV
   };
 }
 
 async function readJson(response) {
-  const payload = await response.json().catch(() => ({}));
+  const contentType = response.headers.get('content-type') || '';
+  const rawText = await response.text().catch(() => '');
+  let payload = {};
+
+  if (rawText) {
+    if (!contentType.includes('application/json')) {
+      throw new Error('Backend API is not connected yet. The frontend received a non-JSON response.');
+    }
+
+    try {
+      payload = JSON.parse(rawText);
+    } catch {
+      throw new Error('The backend returned invalid JSON.');
+    }
+  }
+
   if (!response.ok) {
     throw new Error(payload.error || 'The card detection request failed.');
   }
@@ -283,10 +301,18 @@ export async function gradeCardCondition({ frontFile, backFile, debugMode }) {
 
 export async function fetchRecentScans() {
   if (USE_MOCK_SCAN) return [];
-  return readJson(await fetch(`${API_BASE_URL}/api/cards/scans`));
+  const payload = await readJson(await fetch(`${API_BASE_URL}/api/cards/scans`));
+  if (!Array.isArray(payload)) {
+    throw new Error('Saved scan history response was not an array.');
+  }
+  return payload;
 }
 
 export async function checkApiHealth() {
   if (USE_MOCK_SCAN) return { ok: true, mock: true };
-  return readJson(await fetch(`${API_BASE_URL}/api/health`));
+  const payload = await readJson(await fetch(`${API_BASE_URL}/api/health`));
+  if (!payload?.ok) {
+    throw new Error('Backend health check did not return ok.');
+  }
+  return payload;
 }
