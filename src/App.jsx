@@ -5,6 +5,7 @@ import { FileUpload } from './components/FileUpload.jsx';
 import { HitLogo } from './components/HitLogo.jsx';
 import { ManualCropper } from './components/ManualCropper.jsx';
 import { Results } from './components/Results.jsx';
+import { ScanLoading } from './components/ScanLoading.jsx';
 import {
   checkApiHealth,
   confirmDetectedCard,
@@ -338,10 +339,7 @@ export default function App() {
           </button>
 
           {status === 'scanning' ? (
-            <div className="scanner">
-              <div className="scanner-line" />
-              <span>Detecting the card, extracting OCR, ranking matches, and collecting pricing metadata</span>
-            </div>
+            <ScanLoading />
           ) : (
             <p className={`ready-state ${canAnalyze ? 'ready' : ''}`}>
               {status === 'error'
