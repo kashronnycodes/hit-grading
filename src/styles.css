@@ -475,6 +475,189 @@ input {
   overflow-wrap: anywhere;
 }
 
+.camera-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.88);
+  animation: camera-backdrop-in 180ms ease-out both;
+}
+
+.camera-overlay.is-closing {
+  animation: camera-backdrop-out 140ms ease-in both;
+}
+
+.camera-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(5, 9, 17, 0.96), rgba(0, 0, 0, 0.99)),
+    #000;
+  animation: camera-dialog-in 190ms ease-out both;
+}
+
+.camera-overlay.is-closing .camera-dialog {
+  animation: camera-dialog-out 120ms ease-in both;
+}
+
+.camera-toolbar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 0 0 auto;
+  padding: calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 10px calc(12px + env(safe-area-inset-left));
+  min-height: calc(58px + env(safe-area-inset-top));
+}
+
+.camera-toolbar div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.camera-toolbar strong {
+  color: #f8fbff;
+  font-size: 1rem;
+  line-height: 1.1;
+}
+
+.camera-toolbar span {
+  color: rgba(211, 224, 246, 0.72);
+  font-size: 0.72rem;
+}
+
+.camera-close-button {
+  position: relative;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(228, 238, 255, 0.2);
+  border-radius: 14px;
+  color: #fff;
+  background: rgba(4, 8, 16, 0.76);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(12px);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease,
+    transform 120ms ease,
+    filter 120ms ease;
+}
+
+.camera-close-button:hover,
+.camera-secondary-button:hover,
+.camera-capture-button:hover,
+.camera-auto-toggle:hover,
+.camera-open-button:hover,
+.file-button:hover,
+.analyze-button:hover,
+.secondary-action:hover {
+  filter: brightness(1.08);
+}
+
+.camera-close-button:hover {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.camera-close-button:focus-visible,
+.camera-secondary-button:focus-visible,
+.camera-capture-button:focus-visible,
+.camera-auto-toggle:focus-within,
+.camera-open-button:focus-visible,
+.file-button:focus-within,
+.analyze-button:focus-visible,
+.secondary-action:focus-visible {
+  outline: 2px solid rgba(93, 225, 255, 0.9);
+  outline-offset: 3px;
+}
+
+.camera-close-button:active,
+.camera-secondary-button:active,
+.camera-capture-button:active,
+.camera-auto-toggle:active,
+.camera-open-button:active,
+.file-button:active,
+.analyze-button:active,
+.secondary-action:active {
+  transform: scale(0.98);
+  filter: brightness(0.92);
+}
+
+.camera-viewport {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: #02050a;
+}
+
+.camera-video,
+.camera-photo-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-photo-preview {
+  object-fit: contain;
+  background: #000;
+}
+
+.camera-bottom-bar {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  gap: 9px;
+  flex: 0 0 auto;
+  padding: 10px calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(3, 7, 14, 0.88) 16%, rgba(3, 7, 14, 0.98));
+}
+
+.camera-bottom-bar .camera-readiness {
+  position: static;
+  left: auto;
+  bottom: auto;
+  width: 100%;
+  transform: none;
+  backdrop-filter: blur(12px);
+}
+
+.camera-shutter-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.74);
+  animation: camera-flash 130ms ease-out both;
+}
+
 .camera-modal {
   position: fixed;
   z-index: 50;
@@ -731,6 +914,20 @@ input {
     inset 0 0 22px rgba(52, 255, 166, 0.12);
 }
 
+.camera-card-guide,
+.camera-readiness,
+.camera-secondary-button,
+.camera-capture-button,
+.camera-auto-toggle {
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease,
+    transform 120ms ease,
+    filter 120ms ease;
+}
+
 .camera-card-guide.starting span {
   border-color: #ff6b82;
 }
@@ -819,12 +1016,22 @@ input {
   min-height: 38px;
   color: rgba(226, 237, 255, 0.82);
   font-size: 0.76rem;
+  border: 1px solid rgba(121, 145, 190, 0.18);
+  border-radius: 12px;
+  background: rgba(10, 18, 32, 0.62);
 }
 
 .camera-auto-toggle input {
   width: 18px;
   height: 18px;
   accent-color: #34ffa6;
+}
+
+.camera-auto-toggle.is-selected {
+  border-color: rgba(93, 225, 255, 0.58);
+  color: #f8fbff;
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 0 0 2px rgba(93, 225, 255, 0.08);
 }
 
 .camera-secondary-button {
@@ -2012,6 +2219,58 @@ input {
   }
 }
 
+@keyframes camera-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes camera-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes camera-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes camera-dialog-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.99);
+  }
+}
+
+@keyframes camera-flash {
+  0% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -2031,12 +2290,28 @@ input {
   .spin,
   .scanner-line,
   .scan-sweep,
-  .scan-step-list span {
+  .scan-step-list span,
+  .camera-overlay,
+  .camera-dialog,
+  .camera-close-button,
+  .camera-card-guide,
+  .camera-readiness,
+  .camera-shutter-flash,
+  .camera-capture-button,
+  .camera-secondary-button,
+  .camera-auto-toggle {
     animation: none;
+    transition-duration: 0.01ms;
   }
 }
 
 @media (max-height: 720px) {
+  .camera-toolbar {
+    min-height: calc(48px + env(safe-area-inset-top));
+    padding-top: calc(6px + env(safe-area-inset-top));
+    padding-bottom: 6px;
+  }
+
   .camera-preview {
     min-height: 0;
   }
@@ -2048,6 +2323,48 @@ input {
 
   .camera-tips {
     grid-template-columns: 1fr;
+    gap: 4px;
+    font-size: 0.66rem;
+  }
+
+  .camera-bottom-bar {
+    gap: 7px;
+    padding-top: 8px;
+  }
+
+  .camera-readiness {
+    padding: 8px 10px;
+  }
+
+  .camera-capture-button,
+  .camera-secondary-button {
+    min-height: 46px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .camera-dialog {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  }
+
+  .camera-toolbar {
+    grid-column: 1 / -1;
+  }
+
+  .camera-viewport {
+    min-height: 0;
+  }
+
+  .camera-bottom-bar {
+    align-content: center;
+    background: rgba(3, 7, 14, 0.96);
+  }
+
+  .camera-card-guide {
+    width: min(34vw, 230px);
+    max-height: 82%;
   }
 }
 
@@ -2101,5 +2418,92 @@ input {
   .condition-breakdown-grid,
   .condition-meta-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 760px) {
+  .camera-overlay {
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .camera-dialog {
+    width: min(1000px, calc(100vw - 32px));
+    height: auto;
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+    border: 1px solid rgba(112, 143, 197, 0.28);
+    border-radius: 22px;
+    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.72), 0 0 38px rgba(93, 225, 255, 0.12);
+  }
+
+  .camera-toolbar {
+    min-height: 58px;
+    padding: 12px 14px;
+  }
+
+  .camera-viewport {
+    height: min(62vh, 600px);
+    min-height: 410px;
+    margin: 0 14px;
+    border: 1px solid rgba(120, 142, 185, 0.24);
+    border-radius: 18px;
+  }
+
+  .camera-card-guide {
+    width: min(30vw, 340px);
+    max-height: 80%;
+  }
+
+  .camera-bottom-bar {
+    padding: 12px 14px 14px;
+    background: transparent;
+  }
+
+  .camera-tips {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-left: 0;
+    list-style-position: inside;
+  }
+
+  .camera-actions {
+    grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr);
+    align-items: center;
+  }
+}
+
+@media (min-width: 760px) and (max-height: 760px) {
+  .camera-overlay {
+    padding: 10px;
+  }
+
+  .camera-dialog {
+    width: min(920px, calc(100vw - 20px));
+    max-height: calc(100dvh - 20px);
+  }
+
+  .camera-toolbar {
+    min-height: 50px;
+    padding-block: 8px;
+  }
+
+  .camera-viewport {
+    min-height: 330px;
+    height: min(55vh, 430px);
+  }
+
+  .camera-bottom-bar {
+    gap: 7px;
+    padding-block: 9px 10px;
+  }
+
+  .camera-tips {
+    font-size: 0.66rem;
+  }
+
+  .camera-capture-button,
+  .camera-secondary-button {
+    min-height: 46px;
   }
 }
