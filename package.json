@@ -7,6 +7,7 @@
     "dev:api": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs watch server/src/index.ts",
     "build": "vite build && tsc -p tsconfig.server.json",
     "build:api": "tsc -p tsconfig.server.json",
+    "test:identification": "node --import tsx --test server/tests/*.test.ts",
     "sync:pokemon": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs scripts/syncPokemonMetadata.ts",
     "pokemon:sync:diagnose": "node --use-system-ca ./node_modules/tsx/dist/cli.mjs scripts/diagnosePokemonSync.ts",
     "pokemon:cache:stats": "node ./node_modules/tsx/dist/cli.mjs scripts/pokemonCacheStats.ts",

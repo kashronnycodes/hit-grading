@@ -257,3 +257,16 @@ VITE_API_BASE_URL=https://your-backend-service.example.com
 6. Redeploy after every Vercel environment variable change.
 
 The app has a top-level error boundary. If React crashes, it should show a visible error panel instead of only the background. Deployment diagnostics show current origin, API base URL, mock mode, build mode, and API health status.
+
+## Pokemon identification deployment
+
+Pokemon identification now uses the persistent PaddleOCR service first, local Pokemon cache/TCGdex matching second, and one Scrydex Vision fallback only for an unreliable Paddle-derived match. Tesseract remains installed for experiments but is disabled by `TESSERACT_OCR_ENABLED=false` and is loaded dynamically only when explicitly enabled.
+
+See [paddle-ocr-service/README.md](paddle-ocr-service/README.md) for exact Render setup, environment variables, memory guidance, health checks, service connectivity, and rollback steps.
+
+Local verification:
+
+```powershell
+npm run build:api
+npm run test:identification
+```

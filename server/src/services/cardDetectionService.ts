@@ -5,12 +5,22 @@ import type { ApiSearchDebugEntry, CardCandidate, CardMatchDebugInfo, CardScanRe
 import { withTimeout } from '../utils/async.js';
 import { normalizeKnownPokemonName, normalizePokemonCardNumber, pokemonCardNumbersMatch } from '../utils/pokemonText.js';
 import { CardIdentificationService } from './cardIdentificationService.js';
-import { CardPricingService } from './cardPricingService.js';
+import { CardPricingService, type CardPricingResult } from './cardPricingService.js';
 import { ConditionGradingService } from './conditionGradingService.js';
 import { GradingPrepService } from './gradingPrepService.js';
 import { CardBoundaryDetectionError, ImagePreprocessService } from './imagePreprocessService.js';
 import { OcrService } from './ocrService.js';
 import { ScanPersistenceService } from './scanPersistenceService.js';
+import { isReliablePaddleMatch, PokemonIdentificationFallbackService } from './pokemonIdentificationFallbackService.js';
+
+export class CardNotDetectedError extends Error {
+  readonly code = 'CARD_NOT_IDENTIFIED';
+
+  constructor(message = 'Could not detect card. Please try a clearer image or select the card game manually.') {
+    super(message);
+    this.name = 'CardNotDetectedError';
+  }
+}
 
 export class CardDetectionService {
   constructor(
@@ -20,7 +30,8 @@ export class CardDetectionService {
     private readonly cardPricingService = new CardPricingService(),
     private readonly gradingPrepService = new GradingPrepService(),
     private readonly conditionGradingService = new ConditionGradingService(),
-    private readonly scanPersistenceService = new ScanPersistenceService()
+    private readonly scanPersistenceService = new ScanPersistenceService(),
+    private readonly pokemonIdentificationFallbackService = new PokemonIdentificationFallbackService()
   ) {}
 
   async detect(input: DetectCardInput): Promise<CardScanResult> {
@@ -29,7 +40,25 @@ export class CardDetectionService {
   }
 
   async confirm(scanId: string, confirmedCardId: string, confirmedSource: string, confirmedCandidate?: PublicCardMatch) {
-    return this.scanPersistenceService.markConfirmed(scanId, { confirmedCardId, confirmedSource, confirmedCandidate });
+    const confirmed = await this.scanPersistenceService.markConfirmed(scanId, { confirmedCardId, confirmedSource, confirmedCandidate });
+    if (!confirmed) return null;
+    const officialMatch = confirmedCandidate ?? confirmed.officialMatch ?? confirmed.closestMatch;
+    const pricing = await this.cardPricingService.priceCard({
+      officialMatch,
+      detectedDetails: confirmed.detectedDetails,
+      confidenceScore: officialMatch?.confidenceScore,
+      pricingEligible: true,
+      confirmedIdentity: true,
+      userConfirmed: true,
+      log: (message) => this.log(scanId, message)
+    });
+    const updated = {
+      ...confirmed,
+      estimatedValue: pricing.estimatedValue,
+      officialMatch: officialMatch ? { ...officialMatch, estimatedValue: pricing.estimatedValue ?? officialMatch.estimatedValue } : officialMatch
+    };
+    await this.scanPersistenceService.save(updated);
+    return updated;
   }
 
   async correct(input: CorrectCardInput): Promise<CardScanResult | null> {
@@ -70,16 +99,7 @@ export class CardDetectionService {
     const officialMatch = hasStrongMatch
       ? publicTopMatch
       : fallbackMatch ?? (numberConflict ? this.buildOcrFallbackMatch(detectedDetails, existing.selectedGame) : publicTopMatch ?? this.buildOcrFallbackMatch(detectedDetails, existing.selectedGame));
-    const pricing = await this.cardPricingService.priceCard({
-      officialMatch,
-      bestCandidate: topMatch,
-      detectedDetails,
-      confidenceScore: officialMatch?.confidenceScore,
-      numberConflict,
-      pricingEligible: hasStrongMatch,
-      confirmedIdentity: hasStrongMatch,
-      log: (message) => console.log(`[card-correct:${input.scanId}] ${message}`)
-    });
+    const pricing = getPreConfirmationPricingResult();
     if (officialMatch && pricing.estimatedValue) officialMatch.estimatedValue = pricing.estimatedValue;
     const publicPossibleMatches = [topMatch, ...alternatives].filter(Boolean).map((candidate) => this.toPublicMatch(candidate as CardCandidate));
     const status: CardScanResult['status'] = topMatch?.source === 'local_fallback_database' || fallbackMatch ? 'success_with_fallback' : hasStrongMatch ? 'success' : 'needs_manual_review';
@@ -166,6 +186,7 @@ export class CardDetectionService {
   private async detectInternal(scanId: string, input: DetectCardInput): Promise<CardScanResult> {
     const warnings: string[] = [];
     const selectedLanguage = normalizeLanguage(input.selectedLanguage);
+    this.log(scanId, 'input validated');
     this.log(scanId, 'image uploaded');
     let backImagePath: string | undefined;
     if (input.backImageBuffer) {
@@ -218,6 +239,14 @@ export class CardDetectionService {
     }
     this.log(scanId, 'image preprocessing finished');
     this.log(scanId, `original image size: ${preprocessing.diagnostics.originalWidth}x${preprocessing.diagnostics.originalHeight}`);
+    const boundaryCandidates = preprocessing.diagnostics.cardBoundaryCandidates ?? [];
+    this.log(scanId, `card boundary contour candidates: ${boundaryCandidates.length}`);
+    boundaryCandidates.forEach((candidate, index) => {
+      this.log(
+        scanId,
+        `card boundary candidate ${index + 1}: method=${candidate.method} width=${candidate.width} height=${candidate.height} areaRatio=${candidate.areaRatio} aspectRatio=${candidate.aspectRatio} valid=${candidate.valid}${candidate.confidence !== undefined ? ` confidence=${candidate.confidence}` : ''}${candidate.rejectionReason ? ` rejectionReason=${candidate.rejectionReason}` : ''}`
+      );
+    });
     if (preprocessing.diagnostics.cardDetection) {
       this.log(scanId, `detected card coordinates: ${JSON.stringify(preprocessing.diagnostics.cardDetection.corners)}`);
       this.log(scanId, `aspect ratio: ${preprocessing.diagnostics.cardDetection.aspectRatio.toFixed(3)}`);
@@ -233,8 +262,14 @@ export class CardDetectionService {
     let extracted: Record<string, string | undefined> = {};
     let ocrDebug: OcrDebugInfo = {};
     let ocrReadable = false;
+    let paddleFailureReason: string | null = null;
     try {
       this.log(scanId, 'OCR started');
+      this.log(scanId, 'OCR provider: paddleocr');
+      this.log(scanId, `OCR input source: ${toOcrInputSource(preprocessing.diagnostics.ocrInput?.source ?? preprocessing.diagnostics.crop?.mode)}`);
+      this.log(scanId, `OCR input dimensions: ${preprocessing.diagnostics.ocrInput?.width ?? preprocessing.diagnostics.normalizedWidth ?? 'unknown'}x${preprocessing.diagnostics.ocrInput?.height ?? preprocessing.diagnostics.normalizedHeight ?? 'unknown'}`);
+      this.log(scanId, 'PaddleOCR started');
+      const paddleStartedAt = Date.now();
       const ocr = await this.ocrService.readCard(preprocessing.normalizedBuffer, {
         scanId,
         selectedGame: input.selectedGame,
@@ -242,6 +277,10 @@ export class CardDetectionService {
         cropValid: preprocessing.diagnostics.cropValid,
         cropMode: preprocessing.diagnostics.crop?.mode
       });
+      this.log(scanId, `PaddleOCR finished in ${Date.now() - paddleStartedAt}ms`);
+      if (ocr.debug.inputSource) this.log(scanId, `OCR input source: ${ocr.debug.inputSource}`);
+      if (ocr.debug.inputWidth && ocr.debug.inputHeight) this.log(scanId, `OCR input dimensions: ${ocr.debug.inputWidth}x${ocr.debug.inputHeight}`);
+      this.log(scanId, `OCR regions detected: ${ocr.regions.length}`);
       ocrText = ocr.ocrText;
       this.log(scanId, `raw OCR text: ${truncateForLog(ocr.ocrText)}`);
       this.log(scanId, `top crop OCR text: ${ocr.debug.regionTexts?.name ?? 'n/a'} ${ocr.debug.regionTexts?.hp ?? ''}`.trim());
@@ -264,6 +303,8 @@ export class CardDetectionService {
       if (ocr.debug.collectorNumberCandidates?.length) {
         this.log(scanId, `collector number candidates: ${JSON.stringify(ocr.debug.collectorNumberCandidates)}`);
       }
+      this.log(scanId, `parsed collector candidates: ${JSON.stringify(ocr.debug.collectorNumberCandidates?.map((candidate) => candidate.value) ?? [])}`);
+      this.log(scanId, `parsed name candidates: ${JSON.stringify(extracted.name ? [extracted.name] : [])}`);
       for (const attempt of ocr.debug.attempts ?? []) {
         this.log(scanId, `OCR attempt "${attempt.name}" crop size: ${attempt.cropWidth}x${attempt.cropHeight}`);
         this.log(scanId, `OCR attempt "${attempt.name}" raw text: ${truncateForLog(attempt.rawText)}`);
@@ -291,6 +332,7 @@ export class CardDetectionService {
       this.log(scanId, 'OCR completed');
     } catch (error) {
       warnings.push('OCR could not confidently read the card. Manual selection is recommended.');
+      paddleFailureReason = toFallbackReason(error);
       this.log(scanId, `OCR failed: ${error instanceof Error ? error.message : 'unknown error'}`);
     }
 
@@ -302,6 +344,7 @@ export class CardDetectionService {
     if (!ocrReadable && !canSearch) {
       warnings.push('Card text could not be read clearly. Please try another photo.');
       this.log(scanId, 'API search skipped because OCR did not produce searchable Pokemon fields');
+      if (!isPokemonGame(input.selectedGame)) throw new CardNotDetectedError();
     } else if (input.selectedGame && canSearch) {
       try {
         this.log(scanId, 'API search started');
@@ -342,9 +385,32 @@ export class CardDetectionService {
       this.log(scanId, 'API search skipped because no game was selected');
     }
 
-    const numberConflict = hasNumberConflict(extracted, topMatch);
+    let identificationProvider: 'paddleocr' | 'scrydex' | 'manual' = 'paddleocr';
+    let fallbackReason: string | null = null;
+    const paddleNumberConflict = hasNumberConflict(extracted, topMatch);
+    const paddleAccepted = isReliablePaddleMatch(topMatch, alternatives, paddleNumberConflict);
+    this.log(scanId, `local matches found: ${topMatch ? 1 + alternatives.length : 0}`);
+    this.log(scanId, `PaddleOCR match ${paddleAccepted ? 'accepted' : 'rejected'}`);
+
+    if (isPokemonGame(input.selectedGame) && !paddleAccepted) {
+      const resolved = await this.pokemonIdentificationFallbackService.resolve({
+        frontImage: input.imageBuffer,
+        topMatch,
+        alternatives,
+        numberConflict: paddleNumberConflict,
+        canSearch,
+        paddleFailureReason,
+        log: (message) => this.log(scanId, message)
+      });
+      identificationProvider = resolved.identificationProvider;
+      fallbackReason = resolved.fallbackReason;
+      topMatch = resolved.topMatch;
+      alternatives = resolved.alternatives;
+    }
+
+    const numberConflict = identificationProvider === 'scrydex' ? false : hasNumberConflict(extracted, topMatch);
     const conflictingApiNumber = numberConflict ? topMatch?.cardNumber : undefined;
-    const hasStrongMatch = Boolean(topMatch && !numberConflict && (topMatch.confidence ?? 0) >= 0.85);
+    const hasStrongMatch = Boolean(topMatch && !numberConflict && (topMatch.confidence ?? 0) >= env.PADDLE_OCR_MATCH_THRESHOLD);
     const detectedDetails = this.buildDetectedDetails(extracted, hasStrongMatch ? topMatch : undefined);
     const fallbackCard = !hasStrongMatch && topMatch?.source !== 'local_fallback_database' ? findPokemonFallbackCard(extracted) : undefined;
     const fallbackMatch = fallbackCard ? this.toFallbackMatch(fallbackCard, selectedLanguage) : null;
@@ -364,18 +430,9 @@ export class CardDetectionService {
       ocrDebug
     });
     this.log(scanId, `pricing decision: identityStatus=${identityDecision.status} pricingEligible=${identityDecision.pricingEligible}`);
-    const pricing = await this.cardPricingService.priceCard({
-      officialMatch,
-      bestCandidate: topMatch,
-      detectedDetails,
-      confidenceScore: officialMatch?.confidenceScore,
-      numberConflict,
-      pricingEligible: identityDecision.pricingEligible,
-      confirmedIdentity: identityDecision.confirmedIdentity,
-      log: (message) => this.log(scanId, message)
-    });
+    const pricing = getPreConfirmationPricingResult();
     if (officialMatch && identityDecision.pricingEligible && pricing.estimatedValue) officialMatch.estimatedValue = pricing.estimatedValue;
-    this.log(scanId, `pricing attempted: ${identityDecision.pricingEligible ? 'yes' : 'no'}`);
+    this.log(scanId, 'pricing attempted: no (awaiting user confirmation)');
     this.log(scanId, `Scrydex called: ${pricing.scrydexCalled}`);
     this.log(scanId, `Scrydex skipped reason: ${pricing.scrydexSkippedReason ?? 'n/a'}`);
     this.log(scanId, `pricing provider used: ${pricing.providerUsed}`);
@@ -513,6 +570,9 @@ export class CardDetectionService {
 
     const result: CardScanResult = {
       scanId,
+      identificationProvider,
+      fallbackReason,
+      manualSearchRequired: identificationProvider === 'manual',
       success: identityDecision.confirmedIdentity,
       status: resultStatus,
       identityStatus: identityDecision.status,
@@ -558,6 +618,7 @@ export class CardDetectionService {
             : 'Card text could not be read clearly. Please try another photo.',
       debug: debugPayload
     };
+    this.log(scanId, `final provider: ${identificationProvider}`);
 
     result.gradingPrep = this.gradingPrepService.prepare(result);
 
@@ -666,6 +727,8 @@ export class CardDetectionService {
       imageUrl: candidate.imageUrl,
       confidenceLabel: (candidate.confidence ?? 0) >= 0.85 ? 'Strong match found' : (candidate.confidence ?? 0) >= 0.65 ? 'Review needed' : 'Low confidence',
       confidenceScore: candidate.confidence,
+      identificationProvider: candidate.source === 'scrydex-vision' ? 'scrydex' : 'paddleocr',
+      evidence: candidate.confidenceReasons,
       estimatedValue: candidate.prices
     };
   }
@@ -1135,6 +1198,35 @@ function isValidSearchName(value?: string): boolean {
   if (symbols > letters) return false;
   if (/[=«»<>~_{}[\]\\|]/.test(value) && letters < 5) return false;
   return true;
+}
+
+function isPokemonGame(value?: string): boolean {
+  return String(value ?? '').toLowerCase().includes('pokemon');
+}
+
+function toFallbackReason(error: unknown): string {
+  const code = (error as { code?: string })?.code;
+  if (code === 'TIMEOUT') return 'paddleocr_timeout';
+  if (code === 'UNAVAILABLE' || code === 'NOT_CONFIGURED') return 'paddleocr_unavailable';
+  if (code === 'OCR_FAILED') return 'paddleocr_no_text';
+  return 'paddleocr_failed';
+}
+
+function toOcrInputSource(source?: string): 'validated-card-crop' | 'camera-guide-crop' | 'full-image' {
+  if (source === 'auto' || source === 'manual') return 'validated-card-crop';
+  if (source === 'fallback_center') return 'camera-guide-crop';
+  return 'full-image';
+}
+
+function getPreConfirmationPricingResult(): CardPricingResult {
+  return {
+    estimatedValue: null,
+    providerUsed: 'none',
+    cacheStatus: 'skipped',
+    scrydexCalled: false,
+    scrydexSkippedReason: 'identity_not_confirmed',
+    selectedPriceField: 'none'
+  };
 }
 
 function truncateForLog(value: string, max = 600): string {

@@ -6,6 +6,7 @@ import path from 'node:path';
 import { ZodError } from 'zod';
 import { env } from './config/env.js';
 import { createCardsRouter } from './routes/cards.js';
+import { PaddleOcrProvider } from './providers/paddleOcrProvider.js';
 import { ensureDirectory } from './utils/files.js';
 
 function parseAllowedOrigins(value: string) {
@@ -55,6 +56,7 @@ async function bootstrap() {
   ]);
 
   const app = express();
+  const paddleOcrProvider = new PaddleOcrProvider();
   const projectRoot = process.cwd();
   const distDir = path.join(projectRoot, 'dist');
   const allowedOrigins = new Set([
@@ -81,8 +83,15 @@ async function bootstrap() {
     app.use('/debug-ocr', express.static(path.resolve(process.cwd(), env.OCR_DEBUG_DIR)));
   }
 
-  app.get('/api/health', (_req, res) => {
-    res.json({ ok: true });
+  app.get('/api/health', async (_req, res) => {
+    const paddleOcr = await paddleOcrProvider.health();
+    res.json({
+      ok: true,
+      api: 'ok',
+      paddleOcr,
+      tesseract: { enabled: env.TESSERACT_OCR_ENABLED },
+      scrydexFallback: { enabled: env.SCRYDEX_VISION_FALLBACK_ENABLED }
+    });
   });
 
   app.get('/api/network-info', (req, res) => {
@@ -123,6 +132,9 @@ async function bootstrap() {
   });
 
   app.listen(env.PORT, env.HOST, () => {
+    console.log(`[ocr] Tesseract ${env.TESSERACT_OCR_ENABLED ? 'enabled' : 'disabled'}`);
+    console.log('[ocr] Primary OCR provider: PaddleOCR');
+    console.log('[ocr] Identification fallback: Scrydex Vision');
     console.log(`Card detection API listening on http://${env.HOST}:${env.PORT}`);
     console.log(`API local health: http://127.0.0.1:${env.PORT}/api/health`);
     const lanAddresses = getPrivateIpv4Addresses();

@@ -1,7 +1,8 @@
 import path from 'node:path';
-import Tesseract from 'tesseract.js';
 import sharp from 'sharp';
+import type { WorkerOptions } from 'tesseract.js';
 import { env } from '../config/env.js';
+import { PaddleOcrProvider, type PaddleOcrRegion } from '../providers/paddleOcrProvider.js';
 import type {
   CollectorNumberCandidate,
   CollectorOcrQualityInfo,
@@ -66,6 +67,8 @@ type PokemonRegionRead = {
 };
 
 export class OcrService {
+  constructor(private readonly paddleOcrProvider = new PaddleOcrProvider()) {}
+
   async readCard(
     buffer: Buffer,
     options: ReadCardOptions = {}
@@ -109,6 +112,13 @@ export class OcrService {
     buffer: Buffer,
     options: ReadCardOptions = {}
   ): Promise<{ regions: OcrRegionResult[]; ocrText: string; extracted: ExtractedCardDetails; debug: OcrDebugInfo }> {
+    if (env.PADDLE_OCR_ENABLED) {
+      return this.readPokemonWithPaddle(buffer, options);
+    }
+    if (!env.TESSERACT_OCR_ENABLED) {
+      throw new Error('No OCR provider is enabled.');
+    }
+
     const scanId = options.scanId;
     const attempts: PokemonOcrAttempt[] = [];
     const detectedMetadata = await sharp(buffer).metadata();
@@ -223,6 +233,98 @@ export class OcrService {
               fullCard: `/debug-ocr/${scanId}/perspective_corrected_card.jpg`
             }
           : undefined
+      }
+    };
+  }
+
+  private async readPokemonWithPaddle(
+    buffer: Buffer,
+    options: ReadCardOptions
+  ): Promise<{ regions: OcrRegionResult[]; ocrText: string; extracted: ExtractedCardDetails; debug: OcrDebugInfo }> {
+    const paddle = await this.paddleOcrProvider.recognize(buffer, {
+      scanId: options.scanId,
+      language: options.selectedGame === 'pokemon' ? 'en' : undefined
+    });
+    const semantic = mapPaddleRegions(paddle.regions, paddle.image.width, paddle.image.height);
+    const nameConfidence = semantic.name.length ? averagePaddleConfidence(semantic.name) * 100 : 0;
+    const nameText = selectPaddleNameCandidate(semantic.name);
+    const regionTexts: Partial<Record<OcrRegionName, string>> = {
+      full: joinPaddleText(paddle.regions),
+      name: nameText,
+      hp: joinPaddleText(semantic.hp),
+      attack: joinPaddleText(semantic.attack),
+      bottom: joinPaddleText(semantic.bottom),
+      collector: joinPaddleText(semantic.collector)
+    };
+    const regions = Object.entries(regionTexts).map(([region, text]) => ({
+      region: region as OcrRegionName,
+      text: text ?? '',
+      confidence: averagePaddleConfidence(region === 'full' ? paddle.regions : semantic[region as keyof typeof semantic] ?? []) * 100
+    }));
+    const nameValidation = validatePokemonCardName(nameText, nameConfidence);
+    const extracted = extractPokemonFields(regionTexts, nameValidation);
+    const rawText = paddle.regions.map((region) => region.text.trim()).filter(Boolean).join('\n');
+    const attempt: PokemonOcrAttempt = {
+      name: 'paddleocr full-card OCR',
+      cropWidth: paddle.image.width,
+      cropHeight: paddle.image.height,
+      regions,
+      rawText,
+      cleanedText: normalizeOcrText(rawText),
+      extracted,
+      usefulnessScore: scorePokemonUsefulness(extracted, nameValidation.accepted, averagePaddleConfidence(paddle.regions) * 100),
+      averageConfidence: averagePaddleConfidence(paddle.regions) * 100,
+      rejectedNameReason: nameValidation.accepted ? undefined : nameValidation.reason
+    };
+    const collectorNumberCandidates = buildCollectorNumberCandidates([attempt]);
+    const chosenCollectorNumber = extracted.cardNumber ?? collectorNumberCandidates[0]?.value ?? null;
+    const chosen = collectorNumberCandidates.find((candidate) => candidate.value === chosenCollectorNumber);
+    const finalExtracted = {
+      ...extracted,
+      cardNumber: extracted.cardNumber ?? chosen?.value,
+      collectorNumber: extracted.collectorNumber ?? chosen?.value,
+      localId: extracted.localId ?? chosen?.localId,
+      printedNumber: extracted.printedNumber ?? chosen?.printedNumber,
+      printedTotal: extracted.printedTotal ?? chosen?.printedTotal,
+      setCode: extracted.setCode ?? chosen?.setCode,
+      setName: extracted.setName ?? chosen?.setName
+    };
+    const usefulnessScore = scorePokemonUsefulness(finalExtracted, Boolean(finalExtracted.name), attempt.averageConfidence);
+
+    if (usefulnessScore < 5 && options.frontImageBuffer && options.cropMode !== 'full_image') {
+      const fullImage = await optimizeFullImageForOcr(options.frontImageBuffer);
+      return this.readPokemonWithPaddle(fullImage, {
+        ...options,
+        frontImageBuffer: undefined,
+        cropMode: 'full_image'
+      });
+    }
+
+    return {
+      regions,
+      ocrText: rawText,
+      extracted: finalExtracted,
+      debug: {
+        provider: 'paddleocr',
+        inputSource: options.cropMode === 'fallback_center'
+          ? 'camera-guide-crop'
+          : options.cropMode === 'full_image'
+            ? 'full-image'
+            : 'validated-card-crop',
+        inputWidth: paddle.image.width,
+        inputHeight: paddle.image.height,
+        regionTexts,
+        rawRegionTexts: regionTexts,
+        cleanedText: normalizeOcrText(rawText),
+        extracted: finalExtracted,
+        attempts: [{ ...attempt, extracted: finalExtracted, usefulnessScore }],
+        selectedAttemptName: attempt.name,
+        usefulnessScore,
+        weakResultReason: usefulnessScore < 5 ? 'Not enough Pokemon card signals were found in OCR.' : undefined,
+        rejectedCardNameReason: attempt.rejectedNameReason,
+        collectorNumberCandidates,
+        chosenCollectorNumber,
+        collectorNumberConfidence: getCollectorNumberConfidence(collectorNumberCandidates, chosenCollectorNumber)
       }
     };
   }
@@ -515,14 +617,15 @@ export class OcrService {
   }
 
   private async readRegion(buffer: Buffer): Promise<{ text: string; confidence: number }> {
-    if (env.OCR_PROVIDER === 'paddle' || (env.OCR_PROVIDER === 'auto' && env.PADDLE_OCR_ENDPOINT)) {
+    if (env.PADDLE_OCR_ENABLED && (env.OCR_PROVIDER === 'paddle' || env.OCR_PROVIDER === 'auto')) {
       try {
         return await this.readWithPaddle(buffer);
       } catch {
         if (env.OCR_PROVIDER === 'paddle') throw new Error('PaddleOCR failed for the uploaded scan.');
       }
     }
-    return this.readWithTesseract(buffer);
+    if (env.TESSERACT_OCR_ENABLED) return this.readWithTesseract(buffer);
+    throw new Error('No OCR provider is enabled.');
   }
 
   private async readWithPaddle(buffer: Buffer): Promise<{ text: string; confidence: number }> {
@@ -554,6 +657,7 @@ export class OcrService {
   }
 
   private async readWithTesseract(buffer: Buffer): Promise<{ text: string; confidence: number }> {
+    const Tesseract = await loadTesseract();
     const result = await withTimeout(
       Tesseract.recognize(buffer, 'eng'),
       9000,
@@ -566,13 +670,15 @@ export class OcrService {
   }
 
   private async readCollectorRegion(buffer: Buffer, region: PokemonEvidenceRegionName): Promise<{ text: string; confidence: number }> {
+    if (!env.TESSERACT_OCR_ENABLED) throw new Error('Tesseract OCR is disabled.');
+    const Tesseract = await loadTesseract();
     const isClassic = region === 'collectorClassic' || region === 'collectorRight';
     const result = await Tesseract.recognize(buffer, 'eng', {
       tessedit_pageseg_mode: isClassic ? Tesseract.PSM.SINGLE_LINE : Tesseract.PSM.SPARSE_TEXT,
       tessedit_char_whitelist: isClassic ? '0123456789/' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 /-',
       preserve_interword_spaces: '1',
       user_defined_dpi: '300'
-    } as Partial<Tesseract.WorkerOptions>);
+    } as Partial<WorkerOptions>);
     return {
       text: result.data.text ?? '',
       confidence: result.data.confidence ?? 0
@@ -838,6 +944,42 @@ function normalizeGame(value?: string): SupportedGame | undefined {
   if (lowered.includes('lorc')) return 'lorcana';
   if (lowered.includes('one')) return 'onepiece';
   return 'generic';
+}
+
+async function loadTesseract() {
+  if (!env.TESSERACT_OCR_ENABLED) throw new Error('Tesseract OCR is disabled.');
+  return (await import('tesseract.js')).default;
+}
+
+function mapPaddleRegions(regions: PaddleOcrRegion[], width: number, height: number) {
+  const center = (region: PaddleOcrRegion) => ({
+    x: region.box.reduce((sum, point) => sum + point[0], 0) / 4 / Math.max(1, width),
+    y: region.box.reduce((sum, point) => sum + point[1], 0) / 4 / Math.max(1, height)
+  });
+  return {
+    name: regions.filter((region) => center(region).y <= 0.2 && center(region).x <= 0.7),
+    hp: regions.filter((region) => center(region).y <= 0.2 && center(region).x > 0.55),
+    attack: regions.filter((region) => center(region).y > 0.35 && center(region).y < 0.78),
+    bottom: regions.filter((region) => center(region).y >= 0.68),
+    collector: regions.filter((region) => center(region).y >= 0.76)
+  };
+}
+
+function joinPaddleText(regions: PaddleOcrRegion[]): string {
+  return regions.map((region) => region.text.trim()).filter(Boolean).join('\n');
+}
+
+function averagePaddleConfidence(regions: PaddleOcrRegion[]): number {
+  if (!regions.length) return 0;
+  return regions.reduce((sum, region) => sum + region.confidence, 0) / regions.length;
+}
+
+function selectPaddleNameCandidate(regions: PaddleOcrRegion[]): string {
+  const lines = regions
+    .filter((region) => region.confidence >= 0.45)
+    .map((region) => region.text.replace(/\b(?:BASIC|STAGE\s*\d|HP\s*\d+)\b/gi, '').trim())
+    .filter((line) => line.length >= 3 && line.length <= 40 && (line.match(/[A-Za-z]/g)?.length ?? 0) >= 3);
+  return lines.find((line) => normalizeKnownPokemonName(line)) ?? lines[0] ?? '';
 }
 
 function fusePokemonCollectorEvidence(regionReads: PokemonRegionRead[]): PokemonRegionRead | undefined {
@@ -1178,6 +1320,15 @@ function normalizeToPokemonCard(buffer: Buffer): Promise<Buffer> {
     .toBuffer();
 }
 
+function optimizeFullImageForOcr(buffer: Buffer): Promise<Buffer> {
+  return sharp(buffer)
+    .rotate()
+    .resize({ width: 1800, height: 1800, fit: 'inside', withoutEnlargement: true })
+    .normalize()
+    .jpeg({ quality: 92 })
+    .toBuffer();
+}
+
 function extractPokemonMicroRegion(
   image: sharp.Sharp,
   width: number,
@@ -1209,7 +1360,8 @@ function extractPokemonMicroRegion(
 function validatePokemonCardName(raw?: string, confidence = 100): { accepted: boolean; cleanedName?: string; reason?: string } {
   const knownName = normalizeKnownPokemonName(raw);
   if (knownName && confidence >= 8) {
-    return { accepted: true, cleanedName: knownName };
+    const suffix = String(raw ?? '').match(/\b(ex|gx|vmax|vstar|v)\b/i)?.[1];
+    return { accepted: true, cleanedName: suffix ? `${knownName} ${suffix.toLowerCase()}` : knownName };
   }
   const cleanedName = cleanPokemonName(raw);
   if (!cleanedName) {

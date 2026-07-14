@@ -2,7 +2,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { env } from '../config/env.js';
 import { ensureDirectory } from '../utils/files.js';
-import { CardBoundaryDetectionService } from './cardBoundaryDetectionService.js';
+import { CardBoundaryDetectionService, type CardBoundaryCandidateDiagnostic } from './cardBoundaryDetectionService.js';
 
 export class CardBoundaryDetectionError extends Error {
   constructor(
@@ -39,6 +39,12 @@ export type PreprocessResult = {
       method: string;
     };
     cropValidation?: CropValidation;
+    cardBoundaryCandidates?: CardBoundaryCandidateDiagnostic[];
+    ocrInput?: {
+      source: 'auto' | 'fallback_center' | 'manual' | 'full_image';
+      width?: number;
+      height?: number;
+    };
     crop?: {
       mode: 'auto' | 'fallback_center' | 'manual' | 'full_image';
       valid: boolean;
@@ -126,9 +132,12 @@ export class ImagePreprocessService {
     let cardDetection: PreprocessResult['diagnostics']['cardDetection'] | undefined;
     let cropValidation: CropValidation | undefined;
     let cropDiagnostics: NonNullable<PreprocessResult['diagnostics']['crop']>;
+    let cardBoundaryCandidates: CardBoundaryCandidateDiagnostic[] = [];
+    let ocrInputSource: NonNullable<PreprocessResult['diagnostics']['ocrInput']>['source'];
 
     if (options.manualCrop) {
       normalizedBuffer = await this.applyManualCrop(compressedInput, options.manualCrop);
+      ocrInputSource = 'manual';
       cropValidation = {
         cropWidth: Math.round(options.manualCrop.width * originalWidth),
         cropHeight: Math.round(options.manualCrop.height * originalHeight),
@@ -158,7 +167,9 @@ export class ImagePreprocessService {
         warnings: []
       };
     } else {
-      const detected = await this.cardBoundaryDetectionService.detect(compressedInput);
+      const detectionResult = await this.cardBoundaryDetectionService.detect(compressedInput);
+      cardBoundaryCandidates = detectionResult.candidates;
+      const detected = detectionResult.detection;
       if (detected) {
         cropValidation = validateDetectedCrop(detected.corners, originalWidth, originalHeight);
         cardDetection = {
@@ -174,6 +185,7 @@ export class ImagePreprocessService {
 
         if (detected.confidence >= 0.32 && cropValidation.valid) {
           normalizedBuffer = await this.cardBoundaryDetectionService.warpCard(compressedInput, detected.corners);
+          ocrInputSource = 'auto';
           cropDiagnostics = {
             mode: 'auto',
             valid: true,
@@ -183,43 +195,24 @@ export class ImagePreprocessService {
             warnings: []
           };
         } else {
-          const fallbackCrop = getFallbackCardCrop(originalWidth, originalHeight);
-          normalizedBuffer = await this.applyManualCrop(compressedInput, fallbackCrop);
-          cropDiagnostics = {
-            mode: 'fallback_center',
-            valid: true,
-            confidence: 0.45,
-            coordinates: fallbackCrop,
-            corners: normalizedCropToCorners(fallbackCrop, originalWidth, originalHeight),
-            warnings: [
-              ...(cropValidation?.reasons ?? ['Detected crop was weak.']),
-              'Automatic crop was weak, so a centered fallback crop was used.'
-            ]
-          };
+          const fallback = await this.buildFallbackOrFullImageInput(compressedInput, originalWidth, originalHeight, [
+            ...(cropValidation?.reasons ?? ['Detected crop was weak.']),
+            'Automatic crop was weak, so a centered fallback crop was attempted.'
+          ]);
+          normalizedBuffer = fallback.buffer;
+          cropValidation = fallback.validation;
+          cropDiagnostics = fallback.cropDiagnostics;
+          ocrInputSource = fallback.ocrInputSource;
         }
       } else {
-        cropValidation = {
-          cropWidth: 0,
-          cropHeight: 0,
-          cropArea: 0,
-          originalArea: originalWidth * originalHeight,
-          cropAreaRatio: 0,
-          valid: false,
-          reasons: ['No rectangular card boundary was detected.']
-        };
-        const fallbackCrop = getFallbackCardCrop(originalWidth, originalHeight);
-        normalizedBuffer = await this.applyManualCrop(compressedInput, fallbackCrop);
-        cropDiagnostics = {
-          mode: 'fallback_center',
-          valid: true,
-          confidence: 0.35,
-          coordinates: fallbackCrop,
-          corners: normalizedCropToCorners(fallbackCrop, originalWidth, originalHeight),
-          warnings: [
-            'No rectangular card boundary was detected.',
-            'A centered fallback crop was used.'
-          ]
-        };
+        const fallback = await this.buildFallbackOrFullImageInput(compressedInput, originalWidth, originalHeight, [
+          'No rectangular card boundary was detected.',
+          'A centered fallback crop was attempted.'
+        ]);
+        normalizedBuffer = fallback.buffer;
+        cropValidation = fallback.validation;
+        cropDiagnostics = fallback.cropDiagnostics;
+        ocrInputSource = fallback.ocrInputSource;
       }
     }
 
@@ -260,6 +253,12 @@ export class ImagePreprocessService {
         originalWidth,
         originalHeight,
         cardDetection,
+        cardBoundaryCandidates,
+        ocrInput: {
+          source: ocrInputSource,
+          width: metadata.width,
+          height: metadata.height
+        },
         cropValidation,
         crop: cropDiagnostics
       }
@@ -291,6 +290,61 @@ export class ImagePreprocessService {
       .resize({ width: 734, height: 1024, fit: 'contain', background: '#0b1020' })
       .jpeg({ quality: 94 })
       .toBuffer();
+  }
+
+  private async buildFallbackOrFullImageInput(
+    buffer: Buffer,
+    originalWidth: number,
+    originalHeight: number,
+    warnings: string[]
+  ): Promise<{
+    buffer: Buffer;
+    validation: CropValidation;
+    cropDiagnostics: NonNullable<PreprocessResult['diagnostics']['crop']>;
+    ocrInputSource: NonNullable<PreprocessResult['diagnostics']['ocrInput']>['source'];
+  }> {
+    const fallbackCrop = getFallbackCardCrop(originalWidth, originalHeight);
+    const fallbackCorners = normalizedCropToCorners(fallbackCrop, originalWidth, originalHeight);
+    const fallbackValidation = validateDetectedCrop(fallbackCorners, originalWidth, originalHeight);
+
+    if (fallbackValidation.valid) {
+      return {
+        buffer: await this.applyManualCrop(buffer, fallbackCrop),
+        validation: fallbackValidation,
+        cropDiagnostics: {
+          mode: 'fallback_center',
+          valid: true,
+          confidence: 0.35,
+          coordinates: fallbackCrop,
+          corners: fallbackCorners,
+          warnings
+        },
+        ocrInputSource: 'fallback_center'
+      };
+    }
+
+    return {
+      buffer: await this.normalizeFullFront(buffer),
+      validation: {
+        ...fallbackValidation,
+        valid: false,
+        reasons: [
+          ...fallbackValidation.reasons,
+          'Centered fallback crop was invalid, so OCR used the full preprocessed image.'
+        ]
+      },
+      cropDiagnostics: {
+        mode: 'full_image',
+        valid: false,
+        confidence: 0,
+        warnings: [
+          ...warnings,
+          ...fallbackValidation.reasons,
+          'Centered fallback crop was invalid, so OCR used the full preprocessed image.'
+        ]
+      },
+      ocrInputSource: 'full_image'
+    };
   }
 
   private toPublicUrl(filePath: string, routePrefix: 'uploads' | 'normalized'): string {
@@ -374,22 +428,19 @@ function validateDetectedCrop(corners: Array<{ x: number; y: number }>, original
   const cropArea = cropWidth * cropHeight;
   const originalArea = originalWidth * originalHeight;
   const cropAreaRatio = originalArea ? cropArea / originalArea : 0;
-  const sideLengths = [
-    distance(corners[0], corners[1]),
-    distance(corners[1], corners[2]),
-    distance(corners[2], corners[3]),
-    distance(corners[3], corners[0])
-  ];
-  const minSide = Math.min(...sideLengths);
-  const aspectRatio = cropHeight ? cropWidth / cropHeight : 0;
+  const minPointDistance = minPairwiseDistance(corners);
+  const aspectRatio = cropHeight ? Math.min(cropWidth, cropHeight) / Math.max(cropWidth, cropHeight) : 0;
   const targetAspectRatio = 0.716;
   const reasons: string[] = [];
+  const widthRatio = originalWidth ? cropWidth / originalWidth : 0;
+  const heightRatio = originalHeight ? cropHeight / originalHeight : 0;
+  const portraitSized = widthRatio >= 0.2 && heightRatio >= 0.35;
+  const landscapeSized = widthRatio >= 0.35 && heightRatio >= 0.2;
 
-  if (cropWidth < originalWidth * 0.4) reasons.push('Detected crop width is less than 40% of the original image width.');
-  if (cropHeight < originalHeight * 0.4) reasons.push('Detected crop height is less than 40% of the original image height.');
-  if (cropArea < originalArea * 0.2) reasons.push('Detected crop area is less than 20% of the original image area.');
-  if (Math.abs(aspectRatio - targetAspectRatio) > 0.28) reasons.push('Detected crop aspect ratio is too far from a Pokemon card shape.');
-  if (minSide < Math.min(originalWidth, originalHeight) * 0.12) reasons.push('Detected crop coordinates are too close together.');
+  if (!portraitSized && !landscapeSized) reasons.push('Detected crop width/height ratios are too small for a Pokemon card.');
+  if (cropArea < originalArea * 0.14) reasons.push('Detected crop area is less than 14% of the original image area.');
+  if (Math.abs(aspectRatio - targetAspectRatio) > 0.18) reasons.push('Detected crop aspect ratio is too far from a Pokemon card shape.');
+  if (minPointDistance < Math.min(originalWidth, originalHeight) * 0.1) reasons.push('Detected crop coordinates are too close together.');
 
   return {
     cropWidth: Math.round(cropWidth),
@@ -404,4 +455,14 @@ function validateDetectedCrop(corners: Array<{ x: number; y: number }>, original
 
 function distance(a: { x: number; y: number }, b: { x: number; y: number }) {
   return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function minPairwiseDistance(points: Array<{ x: number; y: number }>) {
+  let min = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < points.length; i += 1) {
+    for (let j = i + 1; j < points.length; j += 1) {
+      min = Math.min(min, distance(points[i], points[j]));
+    }
+  }
+  return min;
 }

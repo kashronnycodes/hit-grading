@@ -8,13 +8,34 @@ export type CardBoundaryDetection = {
   confidence: number;
   method: 'edge-contour' | 'threshold-contour';
   outlinedDebugBuffer: Buffer;
+  candidates: CardBoundaryCandidateDiagnostic[];
+};
+
+export type CardBoundaryCandidateDiagnostic = {
+  method: CardBoundaryDetection['method'];
+  width: number;
+  height: number;
+  areaRatio: number;
+  aspectRatio: number;
+  confidence?: number;
+  valid: boolean;
+  rejectionReason?: string;
+};
+
+export type CardBoundaryDetectionResult = {
+  detection: CardBoundaryDetection | null;
+  candidates: CardBoundaryCandidateDiagnostic[];
 };
 
 export class CardBoundaryDetectionService {
-  async detect(buffer: Buffer): Promise<CardBoundaryDetection | null> {
+  async detect(buffer: Buffer): Promise<CardBoundaryDetectionResult> {
     const primary = await this.detectWithMethod(buffer, 'edge-contour');
-    if (primary) return primary;
-    return this.detectWithMethod(buffer, 'threshold-contour');
+    if (primary.detection) return primary;
+    const secondary = await this.detectWithMethod(buffer, 'threshold-contour');
+    return {
+      detection: secondary.detection,
+      candidates: [...primary.candidates, ...secondary.candidates]
+    };
   }
 
   async warpCard(buffer: Buffer, corners: [Point, Point, Point, Point], width = 734, height = 1024): Promise<Buffer> {
@@ -50,7 +71,7 @@ export class CardBoundaryDetectionService {
     return corrected.resize({ width: 734, height: 1024, fit: 'fill' }).jpeg({ quality: 95 }).toBuffer();
   }
 
-  private async detectWithMethod(buffer: Buffer, method: CardBoundaryDetection['method']): Promise<CardBoundaryDetection | null> {
+  private async detectWithMethod(buffer: Buffer, method: CardBoundaryDetection['method']): Promise<CardBoundaryDetectionResult> {
     const { data, info } = await sharp(buffer)
       .resize({ width: 900, height: 900, fit: 'inside', withoutEnlargement: true })
       .greyscale()
@@ -65,28 +86,32 @@ export class CardBoundaryDetectionService {
       : buildThresholdMask(grayscale, sourceWidth, sourceHeight);
 
     const components = findComponents(mask, sourceWidth, sourceHeight);
-    if (!components.length) return null;
+    if (!components.length) return { detection: null, candidates: [] };
 
     const targetAspect = 734 / 1024;
-    const best = components
-      .map((component) => scoreComponent(component, sourceWidth, sourceHeight, targetAspect))
-      .filter((candidate) => candidate.confidence >= 0.28)
-      .sort((a, b) => b.confidence - a.confidence)[0];
+    const scored = components.map((component) => scoreComponent(component, sourceWidth, sourceHeight, targetAspect, method));
+    const best = scored
+      .filter((candidate) => candidate.valid && candidate.confidence >= 0.28)
+      .sort((a, b) => b.areaRatio - a.areaRatio || b.confidence - a.confidence)[0];
 
-    if (!best) return null;
+    const candidates = scored.map(({ corners: _corners, ...candidate }) => candidate);
+    if (!best) return { detection: null, candidates };
 
-    const scaleX = (await sharp(buffer).metadata()).width ? ((await sharp(buffer).metadata()).width as number) / sourceWidth : 1;
-    const scaleY = (await sharp(buffer).metadata()).height ? ((await sharp(buffer).metadata()).height as number) / sourceHeight : 1;
+    const metadata = await sharp(buffer).metadata();
+    const scaleX = metadata.width ? metadata.width / sourceWidth : 1;
+    const scaleY = metadata.height ? metadata.height / sourceHeight : 1;
     const corners = best.corners.map((point) => ({ x: point.x * scaleX, y: point.y * scaleY })) as [Point, Point, Point, Point];
     const outlinedDebugBuffer = await renderOutline(buffer, corners);
 
-    return {
+    const detection: CardBoundaryDetection = {
       corners,
       aspectRatio: best.aspectRatio,
       confidence: best.confidence,
       method,
-      outlinedDebugBuffer
+      outlinedDebugBuffer,
+      candidates
     };
+    return { detection, candidates };
   }
 }
 
@@ -215,20 +240,91 @@ function findComponents(mask: Uint8Array, width: number, height: number): Compon
   return components;
 }
 
-function scoreComponent(component: Component, width: number, height: number, targetAspect: number) {
+type ScoredComponent = CardBoundaryCandidateDiagnostic & {
+  corners: [Point, Point, Point, Point];
+  confidence: number;
+};
+
+function scoreComponent(
+  component: Component,
+  width: number,
+  height: number,
+  targetAspect: number,
+  method: CardBoundaryDetection['method']
+): ScoredComponent {
   const bboxWidth = component.maxX - component.minX + 1;
   const bboxHeight = component.maxY - component.minY + 1;
   const areaRatio = (bboxWidth * bboxHeight) / (width * height);
   const corners = estimateCorners(component.pixels);
   const quadWidth = averageDistance(corners[0], corners[1], corners[2], corners[3]);
   const quadHeight = averageVerticalDistance(corners[0], corners[3], corners[1], corners[2]);
-  const aspectRatio = Math.min(quadWidth, quadHeight) / Math.max(quadWidth, quadHeight);
+  const longestQuadSide = Math.max(quadWidth, quadHeight);
+  const aspectRatio = longestQuadSide > 0 ? Math.min(quadWidth, quadHeight) / longestQuadSide : 0;
+  const widthRatio = bboxWidth / width;
+  const heightRatio = bboxHeight / height;
+  const minImageDimension = Math.min(width, height);
+  const minPointDistance = minPairwiseDistance(corners);
+  const rejectionReason = getComponentRejectionReason({
+    bboxWidth,
+    bboxHeight,
+    widthRatio,
+    heightRatio,
+    areaRatio,
+    aspectRatio,
+    minPointDistance,
+    minImageDimension,
+    targetAspect
+  });
+  if (rejectionReason) {
+    return {
+      method,
+      corners,
+      width: bboxWidth,
+      height: bboxHeight,
+      areaRatio: round(areaRatio, 4),
+      aspectRatio: round(aspectRatio, 3),
+      confidence: 0,
+      valid: false,
+      rejectionReason
+    };
+  }
+
   const aspectScore = 1 - Math.min(Math.abs(aspectRatio - targetAspect), 0.5) / 0.5;
   const sizeScore = clamp((areaRatio - 0.08) / 0.45, 0, 1);
   const componentFill = clamp(component.pixels.length / (bboxWidth * bboxHeight), 0, 1);
   const fillScore = Math.min(componentFill * 1.6, 1);
   const confidence = Math.round((aspectScore * 0.45 + sizeScore * 0.35 + fillScore * 0.2) * 100) / 100;
-  return { corners, aspectRatio, confidence };
+  return {
+    method,
+    corners,
+    width: bboxWidth,
+    height: bboxHeight,
+    areaRatio: round(areaRatio, 4),
+    aspectRatio: round(aspectRatio, 3),
+    confidence,
+    valid: true
+  };
+}
+
+function getComponentRejectionReason(input: {
+  bboxWidth: number;
+  bboxHeight: number;
+  widthRatio: number;
+  heightRatio: number;
+  areaRatio: number;
+  aspectRatio: number;
+  minPointDistance: number;
+  minImageDimension: number;
+  targetAspect: number;
+}) {
+  const portraitSized = input.widthRatio >= 0.2 && input.heightRatio >= 0.35;
+  const landscapeSized = input.widthRatio >= 0.35 && input.heightRatio >= 0.2;
+  if (input.bboxWidth < 80 || input.bboxHeight < 80) return 'candidate bounding box is too small';
+  if (!portraitSized && !landscapeSized) return 'candidate width/height ratios are too small for a card';
+  if (input.areaRatio < 0.14) return 'candidate area ratio is too small for a card';
+  if (Math.abs(input.aspectRatio - input.targetAspect) > 0.18) return 'candidate aspect ratio is not card-shaped';
+  if (input.minPointDistance < input.minImageDimension * 0.1) return 'candidate corner points are too close together';
+  return undefined;
 }
 
 function estimateCorners(points: Point[]): [Point, Point, Point, Point] {
@@ -360,6 +456,21 @@ function averageVerticalDistance(a: Point, d: Point, b: Point, c: Point) {
 
 function distance(a: Point, b: Point) {
   return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function minPairwiseDistance(points: [Point, Point, Point, Point]) {
+  let min = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < points.length; i += 1) {
+    for (let j = i + 1; j < points.length; j += 1) {
+      min = Math.min(min, distance(points[i], points[j]));
+    }
+  }
+  return min;
+}
+
+function round(value: number, decimals: number) {
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
 }
 
 function clamp(value: number, min: number, max: number) {

@@ -66,6 +66,8 @@ export type PublicCardMatch = {
   confidenceScore?: number;
   setCode?: string;
   tcgplayerProductId?: string;
+  identificationProvider?: 'paddleocr' | 'scrydex';
+  evidence?: string[];
   estimatedValue?: {
     amount?: number;
     min?: number;
@@ -130,6 +132,10 @@ export type ApiSearchDebugEntry = {
 };
 
 export type OcrDebugInfo = {
+  provider?: 'paddleocr' | 'tesseract';
+  inputSource?: 'validated-card-crop' | 'camera-guide-crop' | 'full-image';
+  inputWidth?: number;
+  inputHeight?: number;
   regionTexts?: Partial<Record<OcrRegionName, string>>;
   rawRegionTexts?: Partial<Record<OcrRegionName, string>>;
   cleanedText?: string;
@@ -232,6 +238,9 @@ export type CardMatchDebugInfo = {
 
 export type CardScanResult = {
   scanId: string;
+  identificationProvider?: 'paddleocr' | 'scrydex' | 'manual';
+  fallbackReason?: string | null;
+  manualSearchRequired?: boolean;
   rawImageUrl: string;
   normalizedImageUrl?: string;
   detectedGame?: string;

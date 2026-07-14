@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
-import { CardDetectionService } from '../services/cardDetectionService.js';
+import { CardDetectionService, CardNotDetectedError } from '../services/cardDetectionService.js';
 import { ConditionGradingService } from '../services/conditionGradingService.js';
 
 const upload = multer({
@@ -121,14 +121,26 @@ export function createCardsRouter(cardDetectionService = new CardDetectionServic
           cardName: result.detectedDetails?.cardName,
           alternatives: result.alternatives?.length ?? 0
         });
+        if (getDetectionHttpStatus(result, selectedGame) === 422) {
+          return res.status(422).json({
+            ...result,
+            code: 'CARD_NOT_IDENTIFIED',
+            error: 'Could not detect card. Please try a clearer image or select the card game manually.',
+            manualSearchRequired: true,
+            manualSearchSuggested: true,
+            message: 'We could not identify this card automatically.'
+          });
+        }
         return res.json(result);
       } catch (error) {
         const message = error instanceof Error
           ? error.message
           : 'Could not detect card. Please try a clearer image or select the card game manually.';
         console.error('[cards:detect] errors caught', message);
-        return res.status(500).json({
+        return res.status(error instanceof CardNotDetectedError ? 422 : 500).json({
+          ...(error instanceof CardNotDetectedError ? { code: error.code } : {}),
           error: message,
+          ...(error instanceof CardNotDetectedError ? { manualSearchRequired: true } : {}),
           manualSearchSuggested: true
         });
       }
@@ -219,4 +231,8 @@ export function createCardsRouter(cardDetectionService = new CardDetectionServic
   });
 
   return router;
+}
+
+export function getDetectionHttpStatus(result: { identificationProvider?: string }, selectedGame?: string): 200 | 422 {
+  return result.identificationProvider === 'manual' && String(selectedGame ?? '').toLowerCase().includes('pokemon') ? 422 : 200;
 }
