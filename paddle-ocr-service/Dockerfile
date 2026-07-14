@@ -5,6 +5,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
 
 WORKDIR /service
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+      libgl1 \
+      libglib2.0-0 \
+      libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
